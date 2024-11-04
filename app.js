@@ -2,12 +2,14 @@ require('dotenv').config();
 
 const express = require('express');
 const { initializeDatabase } = require('./config/dbConfig');
-const sorteoRoutes = require('./SorteoRoute'); // Importa las rutas de sorteo
+const sorteoRoutes = require('./routes/SorteoRoutes'); // Importa las rutas de sorteo
 
 const app = express();
+const path = require('path');
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta raíz de bienvenida
 app.get('/', (req, res) => {

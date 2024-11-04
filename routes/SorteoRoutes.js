@@ -3,7 +3,7 @@
 
 const express = require('express');
 const router = express.Router();
-const SorteoController = require('./controllers/SorteoController');
+const SorteoController = require('../controllers/SorteoController');
 
 // Ruta para crear un nuevo sorteo
 router.post('/crear', SorteoController.crearSorteo);

@@ -1,7 +1,7 @@
 // Contiene métodos de acceso a datos para Sorteo
 // Ejemplo: Consultas a la base de datos para Sorteo
 
-const { pool } = require('./config/dbConfig'); // Importar el pool de conexiones
+const { pool } = require('../config/dbConfig'); // Importar el pool de conexiones
 
 class SorteoRepository {
   static async crearSorteo(datosSorteo) {

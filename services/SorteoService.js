@@ -1,7 +1,7 @@
 // Contiene la lógica de negocio de Sorteo
 // Ejemplo: Crear, actualizar, y validar sorteos
 
-const SorteoRepository = require('./repositories/SorteoRepository');
+const SorteoRepository = require('../repositories/SorteoRepository');
 
 class SorteoService {
     static async crearSorteo(datosSorteo) {
