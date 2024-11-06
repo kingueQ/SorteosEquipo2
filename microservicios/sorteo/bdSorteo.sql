@@ -1,7 +1,3 @@
-CREATE DATABASE IF NOT EXISTS sorteo;
-
-USE sorteo;
-
 CREATE TABLE IF NOT EXISTS sorteos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_organizador INT NOT NULL,
