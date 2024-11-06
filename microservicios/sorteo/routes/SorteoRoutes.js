@@ -7,5 +7,7 @@ const SorteoController = require('../controllers/SorteoController');
 
 // Ruta para crear un nuevo sorteo
 router.post('/crear', SorteoController.crearSorteo);
+// Ruta para modificar un sorteo ya existente
+router.put('/modificar/:id', SorteoController.modificarSorteo);
 
 module.exports = router;
