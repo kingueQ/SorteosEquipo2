@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS db_boletos;
+USE db_boletos;
+
+CREATE TABLE IF NOT EXISTS boletos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idSorteo INT NOT NULL,
+    numero INT NOT NULL,
+    estado ENUM('disponible', 'apartado', 'vendido') DEFAULT 'disponible',
+    fechaApartado TIMESTAMP NULL,
+    fechaVenta TIMESTAMP NULL
+);
