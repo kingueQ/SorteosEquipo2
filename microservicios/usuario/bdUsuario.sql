@@ -4,7 +4,9 @@ USE db_usuarios;
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    telefono VARCHAR(20),
+    contrasena VARCHAR(255) NOT NULL,
+    tipo ENUM('cliente', 'organizador') NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
