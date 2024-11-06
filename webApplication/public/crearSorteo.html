@@ -71,13 +71,13 @@
     <h2>Crear Sorteo</h2>
     <form id="crearSorteoForm">
         <label for="idOrganizador">ID del Organizador</label>
-        <input type="number" id="idOrganizador" name="idOrganizador" required>
+        <input type="number" id="idOrganizador" name="idOrganizador" min="0" required>
 
         <label for="cantNumeros">Cantidad de Números</label>
-        <input type="number" id="cantNumeros" name="cantNumeros" required>
+        <input type="number" id="cantNumeros" name="cantNumeros" min="0" required>
 
         <label for="precio">Precio por Número</label>
-        <input type="number" step="0.01" id="precio" name="precio" required>
+        <input type="number" step="0.01" id="precio" name="precio" min="0" max="1000" required>
 
         <label for="fechaInicio">Fecha de Inicio</label>
         <input type="date" id="fechaInicio" name="fechaInicio" required>
@@ -86,7 +86,7 @@
         <input type="date" id="fechaFin" name="fechaFin" required>
 
         <label for="fechaFinApartado">Fecha Límite de Apartado</label>
-        <input type="date" id="fechaFinApartado" name="duracionApartado">
+        <input type="date" id="fechaFinApartado" name="duracionApartado" required>
 
         <label for="imagen">Imagen (URL)</label>
         <input type="text" id="imagen" name="imagen">
@@ -112,8 +112,33 @@
             };
 
             // Validación básica antes de enviar la solicitud
-            if (!formData.idOrganizador || !formData.cantNumeros || !formData.precio || !formData.fechaInicio || !formData.fechaFin) {
-                displayMessage('Por favor, completa todos los campos obligatorios.', 'error');
+            if (!formData.idOrganizador || formData.idOrganizador <= 0) {
+                displayMessage('El ID del organizador debe ser un número entero mayor a 0.', 'error');
+                return;
+            }
+
+            if (!formData.cantNumeros || formData.cantNumeros <= 0) {
+                displayMessage('La cantidad de números debe ser un entero mayor a 0.', 'error');
+                return;
+            }
+
+            if (!formData.precio || formData.precio <= 0) {
+                displayMessage('El precio debe ser un número mayor a 0 y menor a 1000.', 'error');
+                return;
+            }
+
+            if (!formData.fechaInicio) {
+                displayMessage('La fecha de inicio es obligatoria.', 'error');
+                return;
+            }
+
+            if (!formData.fechaFin) {
+                displayMessage('La fecha de fin es obligatoria.', 'error');
+                return;
+            }
+
+            if (!formData.fechaFinApartado) {
+                displayMessage('La fecha limite de apartado es obligatoria.', 'error');
                 return;
             }
 
