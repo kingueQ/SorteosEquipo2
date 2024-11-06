@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 // Usar las rutas
 app.use('/api/v1/sorteos', sorteosRoutes);
 
-// Levanta el servidor del microservicio de Sorteos
+// Inicializa la base de datos y luego inicia el servidor del microservicio de Sorteos
 initializeDatabase().then(() => {
     app.listen(port, () => {
     console.log(`Microservicio de Sorteos corriendo en http://localhost:${port}`);

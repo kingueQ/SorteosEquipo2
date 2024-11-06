@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Sorteo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f5f5f5;
+        }
+
+        form {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            display: block;
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .alert.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert.error {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Modificar Sorteo</h2>
+    <form id="modificarSorteoForm">
+        <label for="idSorteo">ID del Sorteo</label>
+        <input type="number" id="idSorteo" name="idSorteo" min="0" required>
+
+        <label for="idOrganizador">ID del Organizador</label>
+        <input type="number" id="idOrganizador" name="idOrganizador" min="0" required>
+
+        <label for="cantNumeros">Cantidad de Números</label>
+        <input type="number" id="cantNumeros" name="cantNumeros" min="0" required>
+
+        <label for="precio">Precio por Número</label>
+        <input type="number" step="0.01" id="precio" name="precio" min="0" max="1000" required>
+
+        <label for="fechaInicio">Fecha de Inicio</label>
+        <input type="date" id="fechaInicio" name="fechaInicio" required>
+
+        <label for="fechaFin">Fecha de Fin</label>
+        <input type="date" id="fechaFin" name="fechaFin" required>
+
+        <label for="fechaFinApartado">Fecha Límite de Apartado</label>
+        <input type="date" id="fechaFinApartado" name="fechaFinApartado" required>
+
+        <label for="imagen">Imagen (URL)</label>
+        <input type="text" id="imagen" name="imagen">
+
+        <button type="submit">Modificar Sorteo</button>
+    </form>
+
+    <div id="messageContainer"></div>
+
+    <script>
+        async function loadSorteoData(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/v1/sorteos/${id}`);
+                if (response.ok) {
+                    const sorteo = await response.json();
+                    document.getElementById('idOrganizador').value = sorteo.idOrganizador;
+                    document.getElementById('cantNumeros').value = sorteo.cantNumeros;
+                    document.getElementById('precio').value = sorteo.precio;
+                    document.getElementById('fechaInicio').value = sorteo.fechaInicio;
+                    document.getElementById('fechaFin').value = sorteo.fechaFin;
+                    document.getElementById('fechaFinApartado').value = sorteo.fechaFinApartado;
+                    document.getElementById('imagen').value = sorteo.imagen || '';
+                } else {
+                    displayMessage('Sorteo no encontrado', 'error');
+                }
+            } catch (error) {
+                console.error('Error al cargar el sorteo:', error);
+                displayMessage('Error al cargar los datos del sorteo.', 'error');
+            }
+        }
+
+        document.getElementById('modificarSorteoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const idSorteo = parseInt(document.getElementById('idSorteo').value);
+            const formData = {
+                idOrganizador: parseInt(document.getElementById('idOrganizador').value),
+                cantNumeros: parseInt(document.getElementById('cantNumeros').value),
+                precio: parseFloat(document.getElementById('precio').value),
+                fechaInicio: document.getElementById('fechaInicio').value,
+                fechaFin: document.getElementById('fechaFin').value,
+                fechaFinApartado: document.getElementById('fechaFinApartado').value,
+                imagen: document.getElementById('imagen').value.trim(),
+                estado: 'activo'
+            };
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/v1/sorteos/modificar/${idSorteo}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    displayMessage('Sorteo modificado con éxito', 'success');
+                } else {
+                    const error = await response.json();
+                    displayMessage('Error al modificar el sorteo: ' + (error.message || 'Error desconocido'), 'error');
+                }
+            } catch (err) {
+                console.error('Error en la solicitud:', err);
+                displayMessage('Error de conexión, intenta nuevamente.', 'error');
+            }
+        });
+
+        function displayMessage(message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `<div class="alert ${type}">${message}</div>`;
+        }
+
+        document.getElementById('idSorteo').addEventListener('change', (e) => {
+            const id = e.target.value;
+            if (id) loadSorteoData(id);
+        });
+    </script>
+</body>
+
+</html>
