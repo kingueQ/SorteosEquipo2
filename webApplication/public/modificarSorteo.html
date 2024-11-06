@@ -102,15 +102,26 @@
     <script>
         async function loadSorteoData(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/v1/sorteos/${id}`);
+                const response = await fetch(`http://localhost:3000/api/v1/sorteos/consultar/${id}`);
                 if (response.ok) {
                     const sorteo = await response.json();
+
+                    // Función para formatear las fechas
+                    function formatDate(dateString) {
+                        const date = new Date(dateString);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses empiezan desde 0
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    }
+
+                    // Asignar los valores al formulario
                     document.getElementById('idOrganizador').value = sorteo.idOrganizador;
                     document.getElementById('cantNumeros').value = sorteo.cantNumeros;
                     document.getElementById('precio').value = sorteo.precio;
-                    document.getElementById('fechaInicio').value = sorteo.fechaInicio;
-                    document.getElementById('fechaFin').value = sorteo.fechaFin;
-                    document.getElementById('fechaFinApartado').value = sorteo.fechaFinApartado;
+                    document.getElementById('fechaInicio').value = formatDate(sorteo.fechaInicio);
+                    document.getElementById('fechaFin').value = formatDate(sorteo.fechaFin);
+                    document.getElementById('fechaFinApartado').value = formatDate(sorteo.fechaFinApartado);
                     document.getElementById('imagen').value = sorteo.imagen || '';
                 } else {
                     displayMessage('Sorteo no encontrado', 'error');
@@ -148,8 +159,25 @@
                 if (response.ok) {
                     displayMessage('Sorteo modificado con éxito', 'success');
                 } else {
-                    const error = await response.json();
-                    displayMessage('Error al modificar el sorteo: ' + (error.message || 'Error desconocido'), 'error');
+                    try {
+                        const error = await response.json();
+                        console.log('Error response object:', error);
+
+                        // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
+                        let errorMessage = '';
+                        if (typeof error.message === 'object') {
+                            errorMessage = JSON.stringify(error.message);
+                        } else if (typeof error.error === 'object') {
+                            errorMessage = JSON.stringify(error.error);
+                        } else {
+                            errorMessage = error.message || error.error || 'Error desconocido';
+                        }
+
+                        displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
+                    } catch (jsonError) {
+                        // Si la conversión a JSON falla
+                        displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                    }
                 }
             } catch (err) {
                 console.error('Error en la solicitud:', err);

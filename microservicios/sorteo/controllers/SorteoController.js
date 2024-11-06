@@ -34,6 +34,25 @@ class SorteoController {
             res.status(error.status || 500).json({ message: error.message });
         }
     }
+
+    static async consultarSorteo(req, res) {
+        const { id } = req.params; // Obtiene el ID del sorteo de los parámetros de la URL
+    
+        try {
+            // Llama al servicio para consultar el sorteo
+            const sorteo = await SorteoService.consultarSorteo(id);
+    
+            if (!sorteo) {
+                // Si no se encuentra el sorteo, devuelve un error 404
+                return res.status(404).json({ error: 'Sorteo no encontrado' });
+            }
+    
+            res.status(200).json(sorteo); // Devuelve los datos del sorteo encontrado
+        } catch (error) {
+            console.error('Error en consultarSorteo:', error.message);
+            res.status(error.status || 500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = SorteoController;

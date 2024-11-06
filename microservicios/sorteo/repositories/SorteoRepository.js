@@ -62,6 +62,28 @@ class SorteoRepository {
       throw new Error('Error al modificar el sorteo: ' + error.message);
     }
   }
+
+  static async consultarSorteoPorId(id) {
+    // Consulta SQL para obtener un sorteo por su ID
+    const query = `
+      SELECT id, id_organizador AS idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
+      FROM Sorteos
+      WHERE id = ?
+    `;
+
+    try {
+      const [rows] = await pool.execute(query, [id]); // Usar el pool para ejecutar la consulta
+
+      // Si no se encuentra el sorteo, devuelve null
+      if (rows.length === 0) {
+        return null;
+      }
+
+      return rows[0]; // Devuelve el primer resultado encontrado
+    } catch (error) {
+      throw new Error('Error al consultar el sorteo: ' + error.message);
+    }
+  }
 }
 
 module.exports = SorteoRepository;

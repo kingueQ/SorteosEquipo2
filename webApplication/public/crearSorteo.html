@@ -71,13 +71,13 @@
     <h2>Crear Sorteo</h2>
     <form id="crearSorteoForm">
         <label for="idOrganizador">ID del Organizador</label>
-        <input type="number" id="idOrganizador" name="idOrganizador" min="0" required>
+        <input type="number" id="idOrganizador" name="idOrganizador" required>
 
         <label for="cantNumeros">Cantidad de Números</label>
-        <input type="number" id="cantNumeros" name="cantNumeros" min="0" required>
+        <input type="number" id="cantNumeros" name="cantNumeros" required>
 
         <label for="precio">Precio por Número</label>
-        <input type="number" step="0.01" id="precio" name="precio" min="0" max="1000" required>
+        <input type="number" step="0.01" id="precio" name="precio" max="1000" required>
 
         <label for="fechaInicio">Fecha de Inicio</label>
         <input type="date" id="fechaInicio" name="fechaInicio" required>
@@ -122,8 +122,8 @@
                 return;
             }
 
-            if (!formData.precio || formData.precio <= 0) {
-                displayMessage('El precio debe ser un número mayor a 0 y menor a 1000.', 'error');
+            if (!formData.precio || formData.precio <= 0 || formData.precio >=3000) {
+                displayMessage('El precio debe ser un número mayor a 0 y menor a 3000.', 'error');
                 return;
             }
 

@@ -10,4 +10,6 @@ router.post('/crear', SorteoController.crearSorteo);
 // Ruta para modificar un sorteo ya existente
 router.put('/modificar/:id', SorteoController.modificarSorteo);
 
+router.get('/consultar/:id', SorteoController.consultarSorteo);
+
 module.exports = router;
