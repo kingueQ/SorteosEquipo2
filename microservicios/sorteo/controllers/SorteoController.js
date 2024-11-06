@@ -9,16 +9,8 @@ class SorteoController {
         } catch (error) {
             console.error('Error en crearSorteo:', error.message);
 
-            // Parsear el error JSON (en este caso los errores de validación)
-            let detallesError;
-            try {
-                detallesError = JSON.parse(error.message);
-            } catch {
-                detallesError = { error: 'Error desconocido al crear el sorteo' };
-            }
-
             // Enviar detalles de validación de vuelta al frontend
-            res.status(error.status || 500).json(detallesError);
+            res.status(error.status || 500).json({ message: error.message });
         }
     }
 
@@ -39,19 +31,7 @@ class SorteoController {
             console.error('Error en modificarSorteo:', error.message);
 
             // Manejo de errores similar al de crearSorteo
-            let detallesError;
-            try {
-                detallesError = JSON.parse(error.message);
-            } catch {
-                detallesError = { error: 'Error al modificar el sorteo' };
-            }
-
-            // Verificamos si el error tiene detalles específicos para validación
-            if (detallesError && detallesError.error) {
-                return res.status(400).json({ errores: detallesError });
-            }
-
-            res.status(400).json({ error: 'Error desconocido al modificar el sorteo' });
+            res.status(error.status || 500).json({ message: error.message });
         }
     }
 }

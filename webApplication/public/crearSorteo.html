@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,6 +12,7 @@
             margin: 2rem;
             background-color: #f5f5f5;
         }
+
         form {
             max-width: 600px;
             margin: auto;
@@ -19,7 +21,9 @@
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        input, button {
+
+        input,
+        button {
             display: block;
             width: 100%;
             margin-bottom: 1rem;
@@ -27,35 +31,42 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+
         button {
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         label {
             margin-bottom: 0.5rem;
             font-weight: bold;
         }
+
         .alert {
             padding: 10px;
             margin-top: 20px;
             border-radius: 5px;
             font-weight: bold;
         }
+
         .alert.success {
             background-color: #28a745;
             color: white;
         }
+
         .alert.error {
             background-color: #dc3545;
             color: white;
         }
     </style>
 </head>
+
 <body>
     <h2>Crear Sorteo</h2>
     <form id="crearSorteoForm">
@@ -97,7 +108,7 @@
                 fechaFin: document.getElementById('fechaFin').value,
                 fechaFinApartado: document.getElementById('fechaFinApartado').value,
                 imagen: document.getElementById('imagen').value.trim(),
-                estado: 'activo' 
+                estado: 'activo'
             };
 
             // Validación básica antes de enviar la solicitud
@@ -119,8 +130,25 @@
                     const result = await response.json();
                     displayMessage('Sorteo creado con éxito: ID ' + result.id, 'success');
                 } else {
-                    const error = await response.json();
-                    displayMessage('Error al crear el sorteo: ' + (error.error || 'Error desconocido'), 'error');
+                    try {
+                        const error = await response.json();
+                        console.log('Error response object:', error);
+
+                        // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
+                        let errorMessage = '';
+                        if (typeof error.message === 'object') {
+                            errorMessage = JSON.stringify(error.message);
+                        } else if (typeof error.error === 'object') {
+                            errorMessage = JSON.stringify(error.error);
+                        } else {
+                            errorMessage = error.message || error.error || 'Error desconocido';
+                        }
+
+                        displayMessage('Error al crear el sorteo: ' + errorMessage, 'error');
+                    } catch (jsonError) {
+                        // Si la conversión a JSON falla
+                        displayMessage('Error al crear el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                    }
                 }
             } catch (err) {
                 console.error('Error en la solicitud:', err);
@@ -134,4 +162,5 @@
         }
     </script>
 </body>
+
 </html>
