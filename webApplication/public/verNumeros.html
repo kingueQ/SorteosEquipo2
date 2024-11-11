@@ -55,6 +55,11 @@
             margin-bottom: 1rem;
             font-weight: bold;
         }
+        .sorteo-info {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -63,21 +68,26 @@
     <!-- Contenedor de entrada de ID del sorteo -->
     <div class="input-container">
         <input type="number" id="sorteoIdInput" placeholder="ID del sorteo" min="1" required>
-        <button onclick="cargarBoletos()">Ver Números</button>
+        <button onclick="cargarSorteo()">Ver Números</button>
     </div>
 
     <p class="status" id="statusMessage">Ingresa el ID del sorteo para ver los números.</p>
+
+    <div class="sorteo-info" id="sorteoInfo"></div>
+
     <div id="numberContainer" class="number-container"></div>
 
     <script>
-        async function cargarBoletos() {
+        async function cargarSorteo() {
             const sorteoId = document.getElementById('sorteoIdInput').value;
             const statusMessage = document.getElementById('statusMessage');
             const container = document.getElementById('numberContainer');
+            const sorteoInfo = document.getElementById('sorteoInfo');
             
             // Limpiar mensajes previos
             statusMessage.textContent = '';
             container.innerHTML = '';
+            sorteoInfo.innerHTML = '';
 
             if (!sorteoId) {
                 statusMessage.textContent = 'Por favor, ingresa un ID de sorteo válido.';
@@ -85,15 +95,47 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/v1/sorteos/${sorteoId}/numeros`);
-                if (!response.ok) throw new Error('Sorteo no encontrado o no disponible.');
+                // Primero, obtener la información del sorteo
+                const sorteoResponse = await fetch(`http://localhost:3000/api/v1/sorteos/consultar/${sorteoId}`);
+                if (!sorteoResponse.ok) throw new Error('Sorteo no encontrado o no disponible.');
 
-                const numeros = await response.json();
-                renderNumeros(numeros);
+                const sorteo = await sorteoResponse.json();
+
+                // Mostrar la información del sorteo
+                sorteoInfo.innerHTML = `
+                    <p><strong>Fecha de inicio:</strong> ${new Date(sorteo.fechaInicio).toLocaleDateString()}</p>
+                    <p><strong>Fecha de fin de apartado:</strong> ${new Date(sorteo.fechaFinApartado).toLocaleDateString()}</p>
+                    <p><strong>Precio por boleto:</strong> $${sorteo.precio}</p>
+                    <p><strong>Cantidad de boletos:</strong> ${sorteo.cantNumeros}</p>
+                `;
+
+                // Luego, obtener los boletos vendidos o apartados
+                const boletosResponse = await fetch(`http://localhost:3000/api/v1/boletos/consultarTodos/${sorteoId}`);
+                if (!boletosResponse.ok) throw new Error('No se pudieron cargar los boletos.');
+
+                const boletos = await boletosResponse.json();
+                const cantBoletos = sorteo.cantNumeros;
+
+                // Si no hay boletos, crear todos con estado disponible
+                if (boletos.length === 0) {
+                    const numerosDisponibles = Array.from({ length: cantBoletos }, (_, i) => ({
+                        numero: i + 1,
+                        estado: 'disponible'
+                    }));
+                    renderNumeros(numerosDisponibles);
+                } else {
+                    // Si hay boletos vendidos o apartados, integrarlos con los disponibles
+                    const numeros = Array.from({ length: cantBoletos }, (_, i) => {
+                        const boleto = boletos.find(b => b.numero === i + 1);
+                        return boleto ? boleto : { numero: i + 1, estado: 'disponible' };
+                    });
+                    renderNumeros(numeros);
+                }
+
                 statusMessage.textContent = `Números del sorteo ${sorteoId}:`;
             } catch (error) {
                 console.error('Error:', error);
-                statusMessage.textContent = 'No se pudieron cargar los números del sorteo. Intenta nuevamente.';
+                statusMessage.textContent = 'No se pudo cargar la información del sorteo. Intenta nuevamente.';
             }
         }
 

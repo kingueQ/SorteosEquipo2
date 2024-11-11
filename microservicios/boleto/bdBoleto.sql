@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS db_boletos;
-USE db_boletos;
-
 CREATE TABLE IF NOT EXISTS boletos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     idSorteo INT NOT NULL,

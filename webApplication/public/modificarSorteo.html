@@ -71,16 +71,16 @@
     <h2>Modificar Sorteo</h2>
     <form id="modificarSorteoForm">
         <label for="idSorteo">ID del Sorteo</label>
-        <input type="number" id="idSorteo" name="idSorteo" min="0" required>
+        <input type="number" id="idSorteo" name="idSorteo">
 
         <label for="idOrganizador">ID del Organizador</label>
-        <input type="number" id="idOrganizador" name="idOrganizador" min="0" required>
+        <input type="number" id="idOrganizador" name="idOrganizador">
 
         <label for="cantNumeros">Cantidad de Números</label>
-        <input type="number" id="cantNumeros" name="cantNumeros" min="0" required>
+        <input type="number" id="cantNumeros" name="cantNumeros">
 
         <label for="precio">Precio por Número</label>
-        <input type="number" step="0.01" id="precio" name="precio" min="0" max="1000" required>
+        <input type="number" step="0.01" id="precio" name="precio">
 
         <label for="fechaInicio">Fecha de Inicio</label>
         <input type="date" id="fechaInicio" name="fechaInicio" required>
@@ -123,6 +123,17 @@
                     document.getElementById('fechaFin').value = formatDate(sorteo.fechaFin);
                     document.getElementById('fechaFinApartado').value = formatDate(sorteo.fechaFinApartado);
                     document.getElementById('imagen').value = sorteo.imagen || '';
+
+                    // Verificar si la fecha de inicio ya pasó
+                    const fechaInicio = new Date(sorteo.fechaInicio);
+                    const fechaActual = new Date();
+                    if (fechaInicio < fechaActual) {
+                        // Bloquear todos los campos excepto fechaFin
+                        disableFieldsExcept('fechaFin', 'idSorteo');
+                    } else {
+                        // Habilitar todos los campos si la fecha de inicio no ha pasado
+                        enableAllFields();
+                    }
                 } else {
                     displayMessage('Sorteo no encontrado', 'error');
                 }
@@ -130,6 +141,22 @@
                 console.error('Error al cargar el sorteo:', error);
                 displayMessage('Error al cargar los datos del sorteo.', 'error');
             }
+        }
+
+        function disableFieldsExcept(exceptId, exceptId2) {
+            const fields = document.querySelectorAll('input');
+            fields.forEach(field => {
+                if (field.id !== exceptId && field.id !== exceptId2) {
+                    field.disabled = true;
+                }
+            });
+        }
+
+        function enableAllFields() {
+            const fields = document.querySelectorAll('input');
+            fields.forEach(field => {
+                field.disabled = false;
+            });
         }
 
         document.getElementById('modificarSorteoForm').addEventListener('submit', async (e) => {
@@ -147,43 +174,92 @@
                 estado: 'activo'
             };
 
-            try {
-                const response = await fetch(`http://localhost:3000/api/v1/sorteos/modificar/${idSorteo}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+            if (!isAnyFieldDisabled()) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/v1/sorteos/modificar/${idSorteo}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
 
-                if (response.ok) {
-                    displayMessage('Sorteo modificado con éxito', 'success');
-                } else {
-                    try {
-                        const error = await response.json();
-                        console.log('Error response object:', error);
+                    if (response.ok) {
+                        displayMessage('Sorteo modificado con éxito', 'success');
+                    } else {
+                        try {
+                            const error = await response.json();
+                            console.log('Error response object:', error);
 
-                        // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
-                        let errorMessage = '';
-                        if (typeof error.message === 'object') {
-                            errorMessage = JSON.stringify(error.message);
-                        } else if (typeof error.error === 'object') {
-                            errorMessage = JSON.stringify(error.error);
-                        } else {
-                            errorMessage = error.message || error.error || 'Error desconocido';
+                            // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
+                            let errorMessage = '';
+                            if (typeof error.message === 'object') {
+                                errorMessage = JSON.stringify(error.message);
+                            } else if (typeof error.error === 'object') {
+                                errorMessage = JSON.stringify(error.error);
+                            } else {
+                                errorMessage = error.message || error.error || 'Error desconocido';
+                            }
+
+                            displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
+                        } catch (jsonError) {
+                            // Si la conversión a JSON falla
+                            displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
                         }
-
-                        displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
-                    } catch (jsonError) {
-                        // Si la conversión a JSON falla
-                        displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
                     }
+                } catch (err) {
+                    console.error('Error en la solicitud:', err);
+                    displayMessage('Error de conexión, intenta nuevamente.', 'error');
                 }
-            } catch (err) {
-                console.error('Error en la solicitud:', err);
-                displayMessage('Error de conexión, intenta nuevamente.', 'error');
+            } else {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/v1/sorteos/actualizar/${idSorteo}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        displayMessage('Sorteo modificado con éxito', 'success');
+                    } else {
+                        try {
+                            const error = await response.json();
+                            console.log('Error response object:', error);
+
+                            // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
+                            let errorMessage = '';
+                            if (typeof error.message === 'object') {
+                                errorMessage = JSON.stringify(error.message);
+                            } else if (typeof error.error === 'object') {
+                                errorMessage = JSON.stringify(error.error);
+                            } else {
+                                errorMessage = error.message || error.error || 'Error desconocido';
+                            }
+
+                            displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
+                        } catch (jsonError) {
+                            // Si la conversión a JSON falla
+                            displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error en la solicitud:', err);
+                    displayMessage('Error de conexión, intenta nuevamente.', 'error');
+                }
             }
         });
+
+        function isAnyFieldDisabled() {
+            const fields = document.querySelectorAll('input, button');
+            for (let field of fields) {
+                if (field.disabled) {
+                    return true; // Si al menos un campo está deshabilitado, devuelve true
+                }
+            }
+            return false; // Si ningún campo está deshabilitado, devuelve false
+        }
 
         function displayMessage(message, type) {
             const messageContainer = document.getElementById('messageContainer');

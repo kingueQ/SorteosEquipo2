@@ -35,6 +35,26 @@ class SorteoController {
         }
     }
 
+    static async actualizarSorteo(req, res) {
+        const { id } = req.params; // Obtener el ID desde la ruta
+        const datosActualizados = req.body; // Obtener los datos actualizados desde el cuerpo de la solicitud
+
+        try {
+            const resultado = await SorteoService.actualizarSorteo(id, datosActualizados);
+
+            if (resultado) {
+                res.status(200).json({ message: 'Sorteo actualizado con éxito', resultado });
+            } else {
+                res.status(404).json({ message: 'Sorteo no encontrado' });
+            }
+        } catch (error) {
+            console.error('Error en modificarSorteo:', error.message);
+
+            // Manejo de errores similar al de crearSorteo
+            res.status(error.status || 500).json({ message: error.message });
+        }
+    }
+
     static async consultarSorteo(req, res) {
         const { id } = req.params; // Obtiene el ID del sorteo de los parámetros de la URL
     
@@ -49,7 +69,7 @@ class SorteoController {
     
             res.status(200).json(sorteo); // Devuelve los datos del sorteo encontrado
         } catch (error) {
-            console.error('Error en consultarSorteo:', error.message);
+            console.error('Error en controller al consultarSorteo:', error.message);
             res.status(error.status || 500).json({ message: error.message });
         }
     }

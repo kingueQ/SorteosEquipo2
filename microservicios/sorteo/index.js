@@ -1,5 +1,5 @@
 const express = require('express');
-const { initializeDatabase } = require('./dbConfig'); // Importa la función de inicialización
+const { initializeDatabase } = require('./config/dbConfig'); // Importa la función de inicialización
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sorteosRoutes = require('./routes/sorteoRoutes'); // Asegúrate de que la ruta sea correcta
