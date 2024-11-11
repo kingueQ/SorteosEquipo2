@@ -3,33 +3,30 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-// Crear el pool de conexiones
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-// Función para inicializar la base de datos (solo una vez)
+// Crear conexión a la base de datos
 async function initializeDatabase() {
-  try {
-    const connection = await pool.getConnection();
+    const connection = await mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD
+    });
 
-    // Crear la base de datos si no existe
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await connection.query(`USE \`${process.env.DB_NAME}\`;`);
+    try {
+        // Crear la base de datos si no existe
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
+        await connection.query(`USE \`${process.env.DB_NAME}\`;`);
 
-    // Cargar y ejecutar el script SQL para crear la tabla si no existe
-    const sqlScript = fs.readFileSync(path.join(__dirname, '..', 'bdSorteo.sql'), 'utf8');
-    await connection.query(sqlScript);
+        // Cargar y ejecutar el script SQL para crear la tabla si no existe
+        const sqlScript = fs.readFileSync(path.join(__dirname, 'bdSorteo.sql'), 'utf8');
+        await connection.query(sqlScript);
 
-    console.log("Base de datos y tablas inicializadas correctamente.");
-    connection.release();  // Liberar la conexión para que el pool siga disponible
-
-  } catch (error) {
-    console.error("Error al inicializar la base de datos:", error);
-  }
+        console.log("Base de datos y tabla inicializadas correctamente.");
+    } catch (error) {
+        console.error("Error al inicializar la base de datos:", error);
+    } finally {
+        await connection.end();
+    }
 }
 
-module.exports = { pool, initializeDatabase };
+module.exports = { initializeDatabase };
+

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { initializeDatabase } = require('./config/dbConfig'); // Importa la función de inicialización
 const bodyParser = require('body-parser');
