@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Números del Sorteo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f9f9f9;
+        }
+        .number-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            max-width: 800px;
+            margin: auto;
+        }
+        .number {
+            width: 60px;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .number.available { background-color: #28a745; }
+        .number.apartado { background-color: #ffc107; }
+        .number.vendido { background-color: #dc3545; }
+        .status {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>Números Disponibles por Sorteo</h2>
+    <p class="status">Selecciona un número disponible para comprar.</p>
+    <div id="numberContainer" class="number-container"></div>
+
+    <script>
+        // Obtiene el ID del sorteo desde la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sorteoId = urlParams.get('sorteoId');
+
+        async function fetchNumeros() {
+            try {
+                const response = await fetch(`http://localhost:3000/api/v1/sorteos/${sorteoId}/numeros`);
+                if (!response.ok) throw new Error('Error al obtener los números del sorteo');
+                
+                const numeros = await response.json();
+                renderNumeros(numeros);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('numberContainer').innerHTML = '<p>No se pudieron cargar los números del sorteo.</p>';
+            }
+        }
+
+        function renderNumeros(numeros) {
+            const container = document.getElementById('numberContainer');
+            container.innerHTML = ''; // Limpiar contenedor antes de renderizar
+
+            numeros.forEach(numero => {
+                const div = document.createElement('div');
+                div.classList.add('number');
+
+                // Añadir clase según el estado del número
+                if (numero.estado === 'disponible') div.classList.add('available');
+                else if (numero.estado === 'apartado') div.classList.add('apartado');
+                else if (numero.estado === 'vendido') div.classList.add('vendido');
+
+                div.textContent = numero.numero; // Mostrar el número
+                container.appendChild(div);
+            });
+        }
+
+        // Llamada a la función para obtener y mostrar los números
+        fetchNumeros();
+    </script>
+</body>
+</html>
