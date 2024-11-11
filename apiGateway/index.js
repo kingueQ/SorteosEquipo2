@@ -12,11 +12,6 @@ app.use(express.json());
 app.post('/api/v1/sorteos/crear', async (req, res) => {
   const datosSorteo = req.body;
 
-  // Validaciones simples en el API Gateway
-  if (!datosSorteo || !datosSorteo.idOrganizador || !datosSorteo.cantNumeros || !datosSorteo.precio) {
-      return res.status(400).json({ error: 'Faltan campos obligatorios en el cuerpo de la solicitud' });
-  }
-
   try {
       // Llama al microservicio o a la API interna
       const response = await axios.post('http://localhost:3001/api/v1/sorteos/crear', datosSorteo);
@@ -46,11 +41,6 @@ app.post('/api/v1/sorteos/crear', async (req, res) => {
 app.put('/api/v1/sorteos/modificar/:id', async (req, res) => {
   const { id } = req.params;  // Obtiene el ID del sorteo de los parámetros de la URL
   const datosSorteo = req.body;
-
-  // Validaciones simples en el API Gateway
-  if (!datosSorteo || !datosSorteo.idOrganizador || !datosSorteo.cantNumeros || !datosSorteo.precio) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios en el cuerpo de la solicitud' });
-  }
 
   // Validación adicional del ID (asegúrate de que es un número válido)
   if (!id || isNaN(id) || id <= 0) {
@@ -85,11 +75,6 @@ app.put('/api/v1/sorteos/modificar/:id', async (req, res) => {
 app.put('/api/v1/sorteos/actualizar/:id', async (req, res) => {
   const { id } = req.params;  // Obtiene el ID del sorteo de los parámetros de la URL
   const datosSorteo = req.body;
-
-  // Validaciones simples en el API Gateway
-  if (!datosSorteo || !datosSorteo.idOrganizador || !datosSorteo.cantNumeros || !datosSorteo.precio) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios en el cuerpo de la solicitud' });
-  }
 
   // Validación adicional del ID (asegúrate de que es un número válido)
   if (!id || isNaN(id) || id <= 0) {
@@ -157,10 +142,6 @@ app.get('/api/v1/sorteos/consultar/:id', async (req, res) => {
 // Rutas de Boletos
 app.post('/api/v1/boletos/crear', async (req, res) => {
   const datosBoleto = req.body;
-
-  if (!datosBoleto || !datosBoleto.idSorteo || !datosBoleto.numero) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios en el cuerpo de la solicitud' });
-  }
 
   try {
     const response = await axios.post('http://localhost:3002/api/v1/boletos/crear', datosBoleto);

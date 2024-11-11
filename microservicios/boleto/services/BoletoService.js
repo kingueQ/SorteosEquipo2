@@ -8,16 +8,11 @@ class BoletoService {
         // Objeto para almacenar errores de validación
         const errores = {};
 
-        // Validaciones
-        if (!idSorteo || !numero || !estado) {
-            errores.campoObligatorio = 'Todos los campos obligatorios deben estar presentes';
-        }
-
-        if (idSorteo && (!Number.isInteger(idSorteo) || idSorteo <= 0)) {
+        if (!idSorteo || (idSorteo && (!Number.isInteger(idSorteo) || idSorteo <= 0))) {
             errores.idSorteo = 'El idSorteo debe ser un número entero positivo';
         }
 
-        if (numero && (!Number.isInteger(numero) || numero <= 0)) {
+        if (!numero || (numero && (!Number.isInteger(numero) || numero <= 0))) {
             errores.numero = 'El número debe ser un número entero positivo';
         }
 
@@ -65,16 +60,11 @@ class BoletoService {
         // Objeto para almacenar errores de validación
         const errores = {};
 
-        // Validaciones
-        if (!idSorteo || !numero || !estado) {
-            errores.campoObligatorio = 'Todos los campos obligatorios deben estar presentes';
-        }
-
         if (idSorteo && (!Number.isInteger(idSorteo) || idSorteo <= 0)) {
             errores.idSorteo = 'El idSorteo debe ser un número entero positivo';
         }
 
-        if (numero && (!Number.isInteger(numero) || numero <= 0)) {
+        if (!numero || (numero && (!Number.isInteger(numero) || numero <= 0))) {
             errores.numero = 'El número debe ser un número entero positivo';
         }
 

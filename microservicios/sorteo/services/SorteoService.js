@@ -17,20 +17,15 @@ class SorteoService {
         // Objeto para almacenar errores de validación
         const errores = {};
 
-        // Validaciones
-        if (!idOrganizador || !cantNumeros || !precio || !fechaInicio || !fechaFin) {
-            errores.campoObligatorio = 'Todos los campos obligatorios deben estar presentes';
-        }
-
-        if (idOrganizador && (!Number.isInteger(idOrganizador) || idOrganizador <= 0)) {
+        if (!idOrganizador || (idOrganizador && (!Number.isInteger(idOrganizador) || idOrganizador <= 0))) {
             errores.idOrganizador = 'El idOrganizador debe ser un número entero positivo';
         }
 
-        if (cantNumeros && (!Number.isInteger(cantNumeros) || cantNumeros <= 0)) {
+        if (!cantNumeros || (cantNumeros && (!Number.isInteger(cantNumeros) || cantNumeros <= 0))) {
             errores.cantNumeros = 'La cantidad de números debe ser un número entero positivo';
         }
 
-        if (precio && (typeof precio !== 'number' || precio <= 0 || precio >= 3000)) {
+        if (!precio || (precio && (typeof precio !== 'number' || precio <= 0 || precio >= 3000))) {
             errores.precio = 'El precio debe ser un número decimal positivo y no debe ser mayor a 2999';
         }
 
@@ -106,20 +101,15 @@ class SorteoService {
         // Objeto para almacenar errores de validación
         const errores = {};
 
-        // Validaciones
-        if (!idOrganizador || !cantNumeros || !precio || !fechaInicio || !fechaFin) {
-            errores.campoObligatorio = 'Todos los campos obligatorios deben estar presentes';
-        }
-
-        if (idOrganizador && (!Number.isInteger(idOrganizador) || idOrganizador <= 0)) {
+        if (!idOrganizador || (idOrganizador && (!Number.isInteger(idOrganizador) || idOrganizador <= 0))) {
             errores.idOrganizador = 'El idOrganizador debe ser un número entero positivo';
         }
 
-        if (cantNumeros && (!Number.isInteger(cantNumeros) || cantNumeros <= 0)) {
+        if (!cantNumeros || (cantNumeros && (!Number.isInteger(cantNumeros) || cantNumeros <= 0))) {
             errores.cantNumeros = 'La cantidad de números debe ser un número entero positivo';
         }
 
-        if (precio && (typeof precio !== 'number' || precio <= 0 || precio >= 3000)) {
+        if (!precio || (precio && (typeof precio !== 'number' || precio <= 0 || precio >= 3000))) {
             errores.precio = 'El precio debe ser un número decimal positivo y no debe ser mayor a 2999';
         }
 
@@ -193,11 +183,6 @@ class SorteoService {
 
         // Objeto para almacenar errores de validación
         const errores = {};
-
-        // Validaciones
-        if (!idOrganizador || !cantNumeros || !precio || !fechaInicio || !fechaFin) {
-            errores.campoObligatorio = 'Todos los campos obligatorios deben estar presentes';
-        }
 
         if (idOrganizador && (!Number.isInteger(idOrganizador) || idOrganizador <= 0)) {
             errores.idOrganizador = 'El idOrganizador debe ser un número entero positivo';
