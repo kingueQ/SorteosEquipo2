@@ -10,6 +10,28 @@
             margin: 2rem;
             background-color: #f9f9f9;
         }
+        .input-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        input[type="number"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            width: 150px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
         .number-container {
             display: flex;
             flex-wrap: wrap;
@@ -25,7 +47,7 @@
             font-weight: bold;
             color: #fff;
         }
-        .number.available { background-color: #28a745; }
+        .number.disponible { background-color: #28a745; }
         .number.apartado { background-color: #ffc107; }
         .number.vendido { background-color: #dc3545; }
         .status {
@@ -37,24 +59,41 @@
 </head>
 <body>
     <h2>Números Disponibles por Sorteo</h2>
-    <p class="status">Selecciona un número disponible para comprar.</p>
+
+    <!-- Contenedor de entrada de ID del sorteo -->
+    <div class="input-container">
+        <input type="number" id="sorteoIdInput" placeholder="ID del sorteo" min="1" required>
+        <button onclick="cargarBoletos()">Ver Números</button>
+    </div>
+
+    <p class="status" id="statusMessage">Ingresa el ID del sorteo para ver los números.</p>
     <div id="numberContainer" class="number-container"></div>
 
     <script>
-        // Obtiene el ID del sorteo desde la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const sorteoId = urlParams.get('sorteoId');
+        async function cargarBoletos() {
+            const sorteoId = document.getElementById('sorteoIdInput').value;
+            const statusMessage = document.getElementById('statusMessage');
+            const container = document.getElementById('numberContainer');
+            
+            // Limpiar mensajes previos
+            statusMessage.textContent = '';
+            container.innerHTML = '';
 
-        async function fetchNumeros() {
+            if (!sorteoId) {
+                statusMessage.textContent = 'Por favor, ingresa un ID de sorteo válido.';
+                return;
+            }
+
             try {
                 const response = await fetch(`http://localhost:3000/api/v1/sorteos/${sorteoId}/numeros`);
-                if (!response.ok) throw new Error('Error al obtener los números del sorteo');
-                
+                if (!response.ok) throw new Error('Sorteo no encontrado o no disponible.');
+
                 const numeros = await response.json();
                 renderNumeros(numeros);
+                statusMessage.textContent = `Números del sorteo ${sorteoId}:`;
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('numberContainer').innerHTML = '<p>No se pudieron cargar los números del sorteo.</p>';
+                statusMessage.textContent = 'No se pudieron cargar los números del sorteo. Intenta nuevamente.';
             }
         }
 
@@ -67,7 +106,7 @@
                 div.classList.add('number');
 
                 // Añadir clase según el estado del número
-                if (numero.estado === 'disponible') div.classList.add('available');
+                if (numero.estado === 'disponible') div.classList.add('disponible');
                 else if (numero.estado === 'apartado') div.classList.add('apartado');
                 else if (numero.estado === 'vendido') div.classList.add('vendido');
 
@@ -75,9 +114,6 @@
                 container.appendChild(div);
             });
         }
-
-        // Llamada a la función para obtener y mostrar los números
-        fetchNumeros();
     </script>
 </body>
 </html>
