@@ -1,4 +1,4 @@
-const SorteoService = require('../services/SorteoService');
+const SorteoService = require('../services/SorteoService2');
 
 class SorteoController {
     // Método para crear un nuevo sorteo
