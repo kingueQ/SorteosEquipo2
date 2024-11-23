@@ -34,9 +34,20 @@ class SorteoService2 {
         const fechaInicioObj = new Date(year, month - 1, day);
         fechaInicioObj.setHours(0, 0, 0, 0);
 
-        if (isNaN(fechaInicioObj.getTime()) || fechaInicioObj < hoy) {
-            return 'La fecha de inicio debe ser una fecha válida igual o posterior a la fecha actual';
+        if (isNaN(fechaInicioObj.getTime())) {
+            return 'La fecha de inicio debe ser una fecha válida';
         }
+
+        // Validar rango de años (1900-2100)
+        if (year < 1900 || year > 2100) {
+            return 'El año de la fecha de inicio debe estar entre 1900 y 2100';
+        }
+
+        // Validar que la fecha no sea anterior a hoy
+        if (fechaInicioObj < hoy) {
+            return 'La fecha de inicio no debe ser anterior a la fecha actual';
+        }
+
         return null;
     }
 
@@ -48,9 +59,20 @@ class SorteoService2 {
         const [year2, month2, day2] = fechaFin.split('-').map(Number);
         const fechaFinObj = new Date(year2, month2 - 1, day2);
 
-        if (isNaN(fechaFinObj.getTime()) || fechaFinObj <= fechaInicioObj) {
-            return 'La fecha de fin debe ser una fecha válida posterior a la fecha de inicio';
+        if (isNaN(fechaFinObj.getTime())) {
+            return 'La fecha de fin debe ser una fecha válida';
         }
+
+        // Validar rango de años (1900-2100)
+        if (year2 < 1900 || year2 > 2100) {
+            return 'El año de la fecha de fin debe estar entre 1900 y 2100';
+        }
+
+        // Validar que la fecha de fin sea posterior a la fecha de inicio
+        if (fechaFinObj <= fechaInicioObj) {
+            return 'La fecha de fin debe ser posterior a la fecha de inicio';
+        }
+
         return null;
     }
 
@@ -65,9 +87,25 @@ class SorteoService2 {
         const [year3, month3, day3] = fechaFinApartado.split('-').map(Number);
         const fechaFinApartadoObj = new Date(year3, month3 - 1, day3);
 
-        if (isNaN(fechaFinApartadoObj.getTime()) || fechaFinApartadoObj <= fechaInicioObj || fechaFinApartadoObj >= fechaFinObj) {
-            return 'La fecha límite de apartado debe ser posterior a la fecha de inicio y anterior a la fecha fin del sorteo';
+        if (isNaN(fechaFinApartadoObj.getTime())) {
+            return 'La fecha límite de apartado debe ser una fecha válida';
         }
+
+        // Validar rango de años (1900-2100)
+        if (year3 < 1900 || year3 > 2100) {
+            return 'El año de la fecha límite de apartado debe estar entre 1900 y 2100';
+        }
+
+        // Validar que la fecha de fin de apartado sea posterior a la fecha de inicio
+        if (fechaFinApartadoObj <= fechaInicioObj) {
+            return 'La fecha límite de apartado debe ser posterior a la fecha de inicio';
+        }
+
+        // Validar que la fecha de fin de apartado sea anterior a la fecha de fin
+        if (fechaFinApartadoObj >= fechaFinObj) {
+            return 'La fecha límite de apartado debe ser anterior a la fecha de fin';
+        }
+
         return null;
     }
 
@@ -188,18 +226,18 @@ class SorteoService2 {
             error.status = 400; // Código de estado 400 para indicar un error de solicitud incorrecta
             throw error;
         }
-    
+
         try {
             // Llama al repositorio para buscar el sorteo por ID
             const sorteo = await SorteoRepository.consultarSorteoPorId(id);
-    
+
             // Si no se encuentra el sorteo, lanza un error
             if (!sorteo) {
                 const error = new Error('Sorteo no encontrado');
                 error.status = 404; // Código de estado 404 para indicar que no se encontró el sorteo
                 throw error;
             }
-    
+
             return sorteo; // Devuelve el sorteo encontrado
         } catch (error) {
             console.error('Error en service al consultarSorteo:', error.message);

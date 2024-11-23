@@ -64,6 +64,7 @@
             background-color: #dc3545;
             color: white;
         }
+
         .menu-button {
             position: absolute;
             top: 20px;
@@ -78,8 +79,18 @@
             text-decoration: none;
             text-align: center;
         }
+
         .menu-button:hover {
             background-color: #0056b3;
+        }
+
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .alert li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -204,26 +215,36 @@
                     });
 
                     if (response.ok) {
-                        displayMessage('Sorteo modificado con éxito', 'success');
+                        const result = await response.json();
+                        displayMessage(['Sorteo modificado con éxito'], 'success');
                     } else {
                         try {
                             const error = await response.json();
                             console.log('Error response object:', error);
 
-                            // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
-                            let errorMessage = '';
-                            if (typeof error.message === 'object') {
-                                errorMessage = JSON.stringify(error.message);
-                            } else if (typeof error.error === 'object') {
-                                errorMessage = JSON.stringify(error.error);
+                            let errorMessages = [];
+
+                            if (typeof error === 'object') {
+                                if (typeof error.message === 'object') {
+                                    // Procesa los mensajes de error por campo
+                                    errorMessages = Object.entries(error.message).map(
+                                        ([field, message]) => `${field}: ${message}`
+                                    );
+                                } else if (typeof error.message === 'string') {
+                                    errorMessages.push(error.message);
+                                } else {
+                                    // Procesa cualquier otro formato de error
+                                    errorMessages = Object.entries(error).map(
+                                        ([field, message]) => `${field}: ${message}`
+                                    );
+                                }
                             } else {
-                                errorMessage = error.message || error.error || 'Error desconocido';
+                                errorMessages.push(error.message || error.error || 'Error desconocido');
                             }
 
-                            displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
+                            displayMessage(['Error al modificar el sorteo:', ...errorMessages], 'error');
                         } catch (jsonError) {
-                            // Si la conversión a JSON falla
-                            displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                            displayMessage(['Error al modificar el sorteo:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
                         }
                     }
                 } catch (err) {
@@ -241,26 +262,36 @@
                     });
 
                     if (response.ok) {
-                        displayMessage('Sorteo modificado con éxito', 'success');
+                        const result = await response.json();
+                        displayMessage(['Sorteo modificado con éxito'], 'success');
                     } else {
                         try {
                             const error = await response.json();
                             console.log('Error response object:', error);
 
-                            // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
-                            let errorMessage = '';
-                            if (typeof error.message === 'object') {
-                                errorMessage = JSON.stringify(error.message);
-                            } else if (typeof error.error === 'object') {
-                                errorMessage = JSON.stringify(error.error);
+                            let errorMessages = [];
+
+                            if (typeof error === 'object') {
+                                if (typeof error.message === 'object') {
+                                    // Procesa los mensajes de error por campo
+                                    errorMessages = Object.entries(error.message).map(
+                                        ([field, message]) => `${field}: ${message}`
+                                    );
+                                } else if (typeof error.message === 'string') {
+                                    errorMessages.push(error.message);
+                                } else {
+                                    // Procesa cualquier otro formato de error
+                                    errorMessages = Object.entries(error).map(
+                                        ([field, message]) => `${field}: ${message}`
+                                    );
+                                }
                             } else {
-                                errorMessage = error.message || error.error || 'Error desconocido';
+                                errorMessages.push(error.message || error.error || 'Error desconocido');
                             }
 
-                            displayMessage('Error al modificar el sorteo: ' + errorMessage, 'error');
+                            displayMessage(['Error al modificar el sorteo:', ...errorMessages], 'error');
                         } catch (jsonError) {
-                            // Si la conversión a JSON falla
-                            displayMessage('Error al modificar el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                            displayMessage(['Error al modificar el sorteo:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
                         }
                     }
                 } catch (err) {
@@ -280,9 +311,19 @@
             return false; // Si ningún campo está deshabilitado, devuelve false
         }
 
-        function displayMessage(message, type) {
+        function displayMessage(messages, type) {
             const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `<div class="alert ${type}">${message}</div>`;
+
+            if (Array.isArray(messages)) {
+                const formattedMessages = messages.map(msg => `<li>${msg}</li>`).join('');
+                messageContainer.innerHTML = `
+                    <div class="alert ${type}">
+                        <ul>${formattedMessages}</ul>
+                    </div>
+                `;
+            } else {
+                messageContainer.innerHTML = `<div class="alert ${type}">${messages}</div>`;
+            }
         }
 
         document.getElementById('idSorteo').addEventListener('change', (e) => {

@@ -64,6 +64,7 @@
             background-color: #dc3545;
             color: white;
         }
+
         .menu-button {
             position: absolute;
             top: 20px;
@@ -78,8 +79,18 @@
             text-decoration: none;
             text-align: center;
         }
+
         .menu-button:hover {
             background-color: #0056b3;
+        }
+
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .alert li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -130,37 +141,6 @@
                 estado: 'activo'
             };
 
-            // Validación básica antes de enviar la solicitud
-            if (!formData.idOrganizador || formData.idOrganizador <= 0) {
-                displayMessage('El ID del organizador debe ser un número entero mayor a 0.', 'error');
-                return;
-            }
-
-            if (!formData.cantNumeros || formData.cantNumeros <= 0) {
-                displayMessage('La cantidad de números debe ser un entero mayor a 0.', 'error');
-                return;
-            }
-
-            if (!formData.precio || formData.precio <= 0 || formData.precio >=3000) {
-                displayMessage('El precio debe ser un número mayor a 0 y menor a 3000.', 'error');
-                return;
-            }
-
-            if (!formData.fechaInicio) {
-                displayMessage('La fecha de inicio es obligatoria.', 'error');
-                return;
-            }
-
-            if (!formData.fechaFin) {
-                displayMessage('La fecha de fin es obligatoria.', 'error');
-                return;
-            }
-
-            if (!formData.fechaFinApartado) {
-                displayMessage('La fecha limite de apartado es obligatoria.', 'error');
-                return;
-            }
-
             try {
                 const response = await fetch('http://localhost:3000/api/v1/sorteos/crear', {
                     method: 'POST',
@@ -172,39 +152,59 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    displayMessage('Sorteo creado con éxito: ID ' + result.id, 'success');
+                    displayMessage(['Sorteo creado con éxito: ID ' + result.id], 'success');
                 } else {
                     try {
                         const error = await response.json();
                         console.log('Error response object:', error);
 
-                        // Verifica si `error.message` o `error.error` son objetos, y conviértelos en cadenas
-                        let errorMessage = '';
-                        if (typeof error.message === 'object') {
-                            errorMessage = JSON.stringify(error.message);
-                        } else if (typeof error.error === 'object') {
-                            errorMessage = JSON.stringify(error.error);
+                        let errorMessages = [];
+
+                        if (typeof error === 'object') {
+                            if (typeof error.message === 'object') {
+                                // Procesa los mensajes de error por campo
+                                errorMessages = Object.entries(error.message).map(
+                                    ([field, message]) => `${field}: ${message}`
+                                );
+                            } else if (typeof error.message === 'string') {
+                                errorMessages.push(error.message);
+                            } else {
+                                // Procesa cualquier otro formato de error
+                                errorMessages = Object.entries(error).map(
+                                    ([field, message]) => `${field}: ${message}`
+                                );
+                            }
                         } else {
-                            errorMessage = error.message || error.error || 'Error desconocido';
+                            errorMessages.push(error.message || error.error || 'Error desconocido');
                         }
 
-                        displayMessage('Error al crear el sorteo: ' + errorMessage, 'error');
+                        displayMessage(['Error al crear el sorteo:', ...errorMessages], 'error');
                     } catch (jsonError) {
-                        // Si la conversión a JSON falla
-                        displayMessage('Error al crear el sorteo: Error desconocido (fallo al analizar la respuesta)', 'error');
+                        displayMessage(['Error al crear el sorteo:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
                     }
                 }
             } catch (err) {
                 console.error('Error en la solicitud:', err);
-                displayMessage('Error de conexión, intenta nuevamente.', 'error');
+                displayMessage(['Error de conexión, intenta nuevamente.'], 'error');
             }
         });
 
-        function displayMessage(message, type) {
+        function displayMessage(messages, type) {
             const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `<div class="alert ${type}">${message}</div>`;
+
+            if (Array.isArray(messages)) {
+                const formattedMessages = messages.map(msg => `<li>${msg}</li>`).join('');
+                messageContainer.innerHTML = `
+                    <div class="alert ${type}">
+                        <ul>${formattedMessages}</ul>
+                    </div>
+                `;
+            } else {
+                messageContainer.innerHTML = `<div class="alert ${type}">${messages}</div>`;
+            }
         }
     </script>
+
 </body>
 
 </html>

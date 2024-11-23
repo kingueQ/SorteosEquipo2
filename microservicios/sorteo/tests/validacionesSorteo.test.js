@@ -24,17 +24,17 @@ describe('Validaciones de SorteoService', () => {
 
     it('Debe validar correctamente la fecha de inicio', () => {
         expect(SorteoService.validarFechaInicio('2024-12-01')).toBeNull();
-        expect(SorteoService.validarFechaInicio('2020-01-01')).toBe('La fecha de inicio debe ser una fecha válida igual o posterior a la fecha actual');
+        expect(SorteoService.validarFechaInicio('2020-01-01')).toBe('La fecha de inicio no debe ser anterior a la fecha actual');
     });
 
     it('Debe validar correctamente la fecha de fin', () => {
         expect(SorteoService.validarFechaFin('2024-11-01', '2024-11-02')).toBeNull();
-        expect(SorteoService.validarFechaFin('2024-11-01', '2024-10-31')).toBe('La fecha de fin debe ser una fecha válida posterior a la fecha de inicio');
+        expect(SorteoService.validarFechaFin('2024-11-01', '2024-10-31')).toBe('La fecha de fin debe ser posterior a la fecha de inicio');
     });
 
     it('Debe validar correctamente la fecha de fin de apartado', () => {
         expect(SorteoService.validarFechaFinApartado('2024-11-01', '2024-11-03', '2024-11-02')).toBeNull();
-        expect(SorteoService.validarFechaFinApartado('2024-11-01', '2024-11-02', '2024-11-03')).toBe('La fecha límite de apartado debe ser posterior a la fecha de inicio y anterior a la fecha fin del sorteo');
+        expect(SorteoService.validarFechaFinApartado('2024-11-01', '2024-11-02', '2024-11-03')).toBe('La fecha límite de apartado debe ser anterior a la fecha de fin');
     });
 
     it('Debe validar correctamente la imagen', () => {
