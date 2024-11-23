@@ -1,4 +1,4 @@
-const SorteoService = require('../services/SorteoService2');
+const SorteoService = require('../services/SorteoService');
 
 describe('Validaciones de SorteoService', () => {
     it('Debe validar correctamente el idOrganizador', () => {
