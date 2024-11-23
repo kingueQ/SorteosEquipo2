@@ -7,6 +7,5 @@ CREATE TABLE IF NOT EXISTS usuarios (
     correo VARCHAR(100) UNIQUE NOT NULL,
     telefono VARCHAR(20),
     contrasena VARCHAR(255) NOT NULL,
-    tipo ENUM('cliente', 'organizador') NOT NULL,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    tipo ENUM('cliente', 'organizador') NOT NULL
 );
