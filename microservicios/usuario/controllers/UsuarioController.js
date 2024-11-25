@@ -1,4 +1,5 @@
 const UsuarioService = require('../services/UsuarioService');
+const bcrypt = require('bcrypt');
 
 class UsuarioController {
   async createUsuario(req, res) {
@@ -52,33 +53,40 @@ class UsuarioController {
   }
   async loginUsuario(req, res) {
     try {
-        const { email, password } = req.body;
+      const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: "Correo y contraseña son requeridos." });
-        }
+      // Validación de entrada
+      if (!email || !password) {
+        return res.status(400).json({ message: "Correo y contraseña son requeridos." });
+      }
 
-        // Busca al usuario por email
-        const usuario = await UsuarioService.getUsuarioByEmail(email);
+      // Busca al usuario por email
+      const usuario = await UsuarioService.getUsuarioByEmail(email);
 
-        if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado." });
-        }
+      if (!usuario) {
+        return res.status(404).json({ message: "Usuario no encontrado." });
+      }
 
-        // Verifica la contraseña
-        if (password !== usuario.contrasena) {
-            return res.status(401).json({ message: "Credenciales incorrectas." });
-        }
+      // Verifica la contraseña
+      const isMatch = await bcrypt.compare(password, usuario.contrasena);
 
-        // Opcional: Retorna datos del usuario excluyendo la contraseña
-        const { contrasena, ...usuarioSinContrasena } = usuario;
+      if (!isMatch) {
+        return res.status(401).json({ message: "Credenciales incorrectas." });
+      }
 
-        res.status(200).json({ message: "Inicio de sesión exitoso.", usuario: usuarioSinContrasena });
+      // Opcional: Excluir la contraseña antes de responder
+      const { contrasena, ...usuarioSinContrasena } = usuario;
+
+      res.status(200).json({ 
+        message: "Inicio de sesión exitoso.", 
+        usuario: usuarioSinContrasena,
+        nombre: usuario.nombre
+      });
     } catch (error) {
-        console.error("Error en el inicio de sesión:", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+      console.error("Error en el inicio de sesión:", error);
+      res.status(500).json({ message: "Error interno del servidor." });
     }
-}
+  }
 }
 
 module.exports = new UsuarioController();
