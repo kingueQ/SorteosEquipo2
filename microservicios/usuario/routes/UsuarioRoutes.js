@@ -6,5 +6,6 @@ const UsuarioController = require('../controllers/UsuarioController');
 app.post('/crear', UsuarioController.createUsuario);
 app.get('/listarUsuario', UsuarioController.getAllUsuarios);
 app.get('/consultar/:id', UsuarioController.getUsuarioById);
+app.get('/buscar/:email', UsuarioController.getUsuarioByEmail);
 
 module.exports = router;
