@@ -193,6 +193,40 @@ app.get('/api/v1/boletos/consultarTodos/:idSorteo', async (req, res) => {
   }
 });
 
+app.get('/api/v1/usuarios/buscar/:email', async (req, res) => {
+  const { email } = req.params; // Obtiene el ID del sorteo de los parámetros de la URL
+  const datosUsuario = req.body;
+
+  // Validación del ID (asegúrate de que es un número válido y positivo)
+  if (!email || isNaN(email)) {
+    return res.status(400).json({ error: 'El email del sorteo debe cumplir con el formato esperado' });
+  }
+
+  try {
+    // Llama al microservicio o a la API interna para obtener el sorteo
+    const response = await axios.get(`http://localhost:3003/api/v1/usuarios/buscar/${email}`, datosUsuario);
+
+    // Si todo está bien, responde con los datos del sorteo
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error al consultar sorteo:', error.message);
+
+    if (error.response) {
+      console.error('Error tiene response:', error.response.data.message);
+      // Si el microservicio responde con error, propaga el estado y mensaje intactos
+      res.status(error.response.status || 500).json({ message: error.response.data.message || 'Error en el servidor' });
+    } else if (error.request) {
+      // Si no hubo respuesta del microservicio
+      console.error('No se recibió respuesta del servidor:', error.request);
+      res.status(500).json({ error: 'No se recibió respuesta del servidor' });
+    } else {
+      // Error en la configuración de la solicitud
+      console.error('Error al configurar la solicitud:', error.message);
+      res.status(500).json({ error: 'Error desconocido' });
+    }
+  }
+});
+
 // Función para manejar errores
 function handleErrorResponse(error, res, defaultMessage) {
   console.error(defaultMessage, error.message);
