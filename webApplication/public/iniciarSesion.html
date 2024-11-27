@@ -80,11 +80,13 @@
     <form id="loginForm">
       <div class="form-group">
         <label for="correo">Correo:</label>
-        <input type="email" id="correo" name="correo" required placeholder="Ingresa tu correo">
+        <input type="text" id="correo" name="correo" required placeholder="Ingresa tu correo o telefono">
+        <p id="correoError" class="error-message"></p>
       </div>
       <div class="form-group">
         <label for="contrasena">Contraseña:</label>
         <input type="password" id="contrasena" name="contrasena" required placeholder="Ingresa tu contraseña">
+        <p id="contrasenaError" class="error-message"></p>
       </div>
       <button type="submit">Iniciar Sesión</button>
     </form>
@@ -96,6 +98,31 @@
 
       const correo = document.getElementById('correo').value;
       const contrasena = document.getElementById('contrasena').value;
+      const correoError = document.getElementById('correoError');
+      const contrasenaError = document.getElementById('contrasenaError');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Limpiar mensajes de error
+      correoError.innerText = '';
+      contrasenaError.innerText = '';
+      errorMessage.innerText = '';
+
+      // Expresiones regulares
+      const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const telefonoRegex = /^\+?[0-9]{10,14}$/; // Permite números de 10-14 dígitos, opcional con "+" al inicio.
+
+      // Validar correo o teléfono
+      if (!correoRegex.test(correo) && !telefonoRegex.test(correo)) {
+        correoError.innerText =
+          'Por favor, ingresa un correo válido (ej. correo@dominio.com) o un teléfono válido (ej. +1234567890).';
+        return;
+      }
+
+      // Validar contraseña (ejemplo: no vacía y longitud mínima)
+      //if (contrasena.length < 6) {
+      //  contrasenaError.innerText = 'La contraseña debe tener al menos 6 caracteres.';
+      //  return;
+      //}
 
       try {
         // Realiza la petición al backend
@@ -115,15 +142,15 @@
           alert(`Bienvenido, ${nombreUsuario}!`);
           window.location.href = '/inicio.html';
         } else {
-          document.getElementById('errorMessage').innerText = data.message || 'Correo o contraseña incorrectos.';
+          errorMessage.innerText = data.message || 'Correo o contraseña incorrectos.';
         }
       } catch (error) {
-        document.getElementById('errorMessage').innerText = 'Error de conexión. Intenta nuevamente.';
+        errorMessage.innerText = 'Error de conexión. Intenta nuevamente.';
         console.error('Error:', error);
       }
     });
   </script>
-
+  
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 const SorteoRepository = require('../repositories/SorteoRepository');
 
-class SorteoService2 {
+class SorteoService {
 
     // Método para validar el id del organizador
     static validarIdOrganizador(idOrganizador) {
@@ -138,14 +138,14 @@ class SorteoService2 {
         const errores = {};
 
         // Validaciones individuales
-        errores.idOrganizador = SorteoService2.validarIdOrganizador(datosSorteo.idOrganizador);
-        errores.cantNumeros = SorteoService2.validarCantidadNumeros(datosSorteo.cantNumeros);
-        errores.precio = SorteoService2.validarPrecio(datosSorteo.precio);
-        errores.fechaInicio = SorteoService2.validarFechaInicio(datosSorteo.fechaInicio);
-        errores.fechaFin = SorteoService2.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
-        errores.fechaFinApartado = SorteoService2.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
-        errores.imagen = SorteoService2.validarImagen(datosSorteo.imagen);
-        errores.estado = SorteoService2.validarEstado(datosSorteo.estado);
+        errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
+        errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
+        errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
+        errores.fechaFin = SorteoService.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
+        errores.fechaFinApartado = SorteoService.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
+        errores.imagen = SorteoService.validarImagen(datosSorteo.imagen);
+        errores.estado = SorteoService.validarEstado(datosSorteo.estado);
 
         // Filtramos los errores nulos
         Object.keys(errores).forEach(key => errores[key] === null && delete errores[key]);
@@ -167,14 +167,14 @@ class SorteoService2 {
         const errores = {};
 
         // Validaciones individuales
-        errores.idOrganizador = SorteoService2.validarIdOrganizador(datosSorteo.idOrganizador);
-        errores.cantNumeros = SorteoService2.validarCantidadNumeros(datosSorteo.cantNumeros);
-        errores.precio = SorteoService2.validarPrecio(datosSorteo.precio);
-        errores.fechaInicio = SorteoService2.validarFechaInicio(datosSorteo.fechaInicio);
-        errores.fechaFin = SorteoService2.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
-        errores.fechaFinApartado = SorteoService2.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
-        errores.imagen = SorteoService2.validarImagen(datosSorteo.imagen);
-        errores.estado = SorteoService2.validarEstado(datosSorteo.estado);
+        errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
+        errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
+        errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
+        errores.fechaFin = SorteoService.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
+        errores.fechaFinApartado = SorteoService.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
+        errores.imagen = SorteoService.validarImagen(datosSorteo.imagen);
+        errores.estado = SorteoService.validarEstado(datosSorteo.estado);
 
         // Filtramos los errores nulos
         Object.keys(errores).forEach(key => errores[key] === null && delete errores[key]);
@@ -195,14 +195,14 @@ class SorteoService2 {
         const errores = {};
 
         // Validaciones individuales
-        errores.idOrganizador = SorteoService2.validarIdOrganizador(datosSorteo.idOrganizador);
-        errores.cantNumeros = SorteoService2.validarCantidadNumeros(datosSorteo.cantNumeros);
-        errores.precio = SorteoService2.validarPrecio(datosSorteo.precio);
-        errores.fechaInicio = SorteoService2.validarFechaInicio(datosSorteo.fechaInicio);
-        errores.fechaFin = SorteoService2.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
-        errores.fechaFinApartado = SorteoService2.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
-        errores.imagen = SorteoService2.validarImagen(datosSorteo.imagen);
-        errores.estado = SorteoService2.validarEstado(datosSorteo.estado);
+        errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
+        errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
+        errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
+        errores.fechaFin = SorteoService.validarFechaFin(datosSorteo.fechaInicio, datosSorteo.fechaFin);
+        errores.fechaFinApartado = SorteoService.validarFechaFinApartado(datosSorteo.fechaInicio, datosSorteo.fechaFin, datosSorteo.fechaFinApartado);
+        errores.imagen = SorteoService.validarImagen(datosSorteo.imagen);
+        errores.estado = SorteoService.validarEstado(datosSorteo.estado);
 
         // Filtramos los errores nulos
         Object.keys(errores).forEach(key => errores[key] === null && delete errores[key]);
@@ -244,14 +244,14 @@ class SorteoService2 {
             throw error; // Re-lanza el error para que sea manejado por el controlador
         }
     }
-
-    static async listarSorteos(){
+  
+    static async listarSorteos() {
         try {
             // Llama al repositorio para buscar el sorteo por ID
             const sorteos = await SorteoRepository.listarSorteos();
 
             // Si no se encuentra el sorteo, lanza un error
-            if (sorteos.length<=0) {
+            if (sorteos.length <= 0) {
                 const error = new Error('Ningún sorteo fue encontrado');
                 error.status = 404; // Código de estado 404 para indicar que no se encontró el sorteo
                 throw error;
@@ -265,4 +265,4 @@ class SorteoService2 {
     }
 }
 
-module.exports = SorteoService2;
+module.exports = SorteoService;
