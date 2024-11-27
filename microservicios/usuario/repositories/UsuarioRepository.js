@@ -33,6 +33,12 @@ class UsuarioRepository {
     const [rows] = await pool.query(query, [correo]);
     return rows[0] || null;
   }
+
+  async findByTelefono(telefono) {
+    const query = `SELECT * FROM usuarios WHERE telefono = ?;`;
+    const [rows] = await pool.query(query, [telefono]);
+    return rows[0] || null;
+  }
 }
 
 module.exports = new UsuarioRepository();

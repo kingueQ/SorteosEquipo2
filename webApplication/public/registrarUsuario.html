@@ -34,7 +34,6 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             box-sizing: border-box;
-            
             transition: border-color 0.3s ease;
         }
 
@@ -169,8 +168,34 @@
                         window.location.href = 'iniciarSesion.html';
                     }, 3000);
                 } else {
-                    const error = await response.json();
-                    displayMessage(['Error al registrar el usuario:', error.message || 'Error desconocido'], 'error');
+                    try {
+                        const error = await response.json();
+                        console.log('Error response object:', error);
+
+                        let errorMessages = [];
+
+                        if (typeof error === 'object') {
+                            if (typeof error.message === 'object') {
+                                // Procesa los mensajes de error por campo
+                                errorMessages = Object.entries(error.message).map(
+                                    ([field, message]) => `${field}: ${message}`
+                                );
+                            } else if (typeof error.message === 'string') {
+                                errorMessages.push(error.message);
+                            } else {
+                                // Procesa cualquier otro formato de error
+                                errorMessages = Object.entries(error).map(
+                                    ([field, message]) => `${field}: ${message}`
+                                );
+                            }
+                        } else {
+                            errorMessages.push(error.message || error.error || 'Error desconocido');
+                        }
+
+                        displayMessage(['Error al registrar el usuario:', ...errorMessages], 'error');
+                    } catch (jsonError) {
+                        displayMessage(['Error al registrar el usuario:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
+                    }
                 }
             } catch (err) {
                 console.error('Error en la solicitud:', err);
