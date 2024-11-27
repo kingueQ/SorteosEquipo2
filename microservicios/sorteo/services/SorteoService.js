@@ -244,6 +244,25 @@ class SorteoService2 {
             throw error; // Re-lanza el error para que sea manejado por el controlador
         }
     }
+
+    static async listarSorteos(){
+        try {
+            // Llama al repositorio para buscar el sorteo por ID
+            const sorteos = await SorteoRepository.listarSorteos();
+
+            // Si no se encuentra el sorteo, lanza un error
+            if (sorteos.length<=0) {
+                const error = new Error('Ningún sorteo fue encontrado');
+                error.status = 404; // Código de estado 404 para indicar que no se encontró el sorteo
+                throw error;
+            }
+
+            return sorteos; // Devuelve el sorteo encontrado
+        } catch (error) {
+            console.error('Error en service al listar sorteos:', error.message);
+            throw error; // Re-lanza el error para que sea manejado por el controlador
+        }
+    }
 }
 
 module.exports = SorteoService2;
