@@ -11,5 +11,6 @@ router.post('/crear', SorteoController.crearSorteo);
 router.put('/modificar/:id', SorteoController.modificarSorteo);
 router.put('/actualizar/:id', SorteoController.actualizarSorteo);
 router.get('/consultar/:id', SorteoController.consultarSorteo);
+router.get('/listar', SorteoController.listarSorteos);
 
 module.exports = router;

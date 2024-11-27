@@ -77,6 +77,25 @@ class SorteoRepository {
       throw new Error('Error en repository al consultar el sorteo: ' + error.message);
     }
   }
+
+  static async listarSorteos(){
+    const query = `
+      SELECT id, id_organizador AS idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
+      FROM Sorteos
+    `;
+
+    try {
+      const [rows] = await pool.execute(query);
+
+      if (rows.length === 0) {
+        return null;
+      }
+
+      return rows;
+    } catch (error) {
+      throw new Error('Error en repository al consultar el sorteo: ' + error.message);
+    }
+  }
 }
 
 module.exports = SorteoRepository;
