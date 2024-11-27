@@ -74,12 +74,12 @@ class SorteoController {
         }
     }
 
-    static async listarSorteos(){
+    static async listarSorteos(req, res) { // Asegúrate de incluir los parámetros req, res
         try {
             // Llama al servicio para consultar el sorteo
-            const sorteos = await SorteoService.listarSorteos;
+            const sorteos = await SorteoService.listarSorteos();
     
-            if (sorteos.length<=0) {
+            if (sorteos.length <= 0) {
                 // Si no se encuentra el sorteo, devuelve un error 404
                 return res.status(404).json({ error: 'Ningún sorteo fue encontrado' });
             }
@@ -90,6 +90,7 @@ class SorteoController {
             res.status(error.status || 500).json({ message: error.message });
         }
     }
+    
 }
 
 module.exports = SorteoController;

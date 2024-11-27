@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablero de Control de Sorteo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <h1>Tablero de Control</h1>
+
+    <!-- Selección de sorteo -->
+    <div class="select-sorteo">
+      <label for="sorteo">Seleccionar Sorteo:</label>
+      <select id="sorteo" onchange="cargarDatosSorteo()">
+        <!-- Aquí se llenarán las opciones dinámicamente -->
+      </select>
+    </div>
+
+    <!-- Información del sorteo -->
+    <div class="sorteo-info">
+      <h2 id="titulo-sorteo">Nombre del Sorteo</h2>
+      <p><strong>Fecha de Fin:</strong> <span id="fecha-fin"></span></p>
+      <p><strong>Días Restantes:</strong> <span id="dias-restantes"></span></p>
+    </div>
+
+    <!-- Estado de los boletos -->
+    <div class="boletos-status">
+      <h3>Estado de los Boletos</h3>
+      <div class="status-cards">
+        <div class="card">
+          <h4>Recaudación Total</h4>
+          <p>$<span id="recaudado">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Vendidos</h4>
+          <p><span id="vendidos">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Apartados</h4>
+          <p><span id="apartados">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Disponibles</h4>
+          <p><span id="disponibles">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfica (opcional) -->
+    <canvas id="boletosChart"></canvas>
+  </div>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+  
+    .dashboard-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+  
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      color: #333;
+    }
+  
+    .select-sorteo {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+  
+    .sorteo-info,
+    .boletos-status {
+      margin-bottom: 2rem;
+    }
+  
+    .status-cards {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+  
+    .card {
+      background: #007bff;
+      color: white;
+      border-radius: 10px;
+      padding: 1rem;
+      width: 20%;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+  
+    .card h4 {
+      margin-bottom: 0.5rem;
+    }
+  
+    canvas {
+      max-width: 100%;
+      margin: 2rem auto;
+    }
+  </style>
+
+  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3001/api/v1/sorteos/listar/';
+    let chartInstance;
+
+    async function cargarDatosSorteo() {
+      const sorteoSelect = document.getElementById('sorteo');
+      const idSorteo = sorteoSelect.value;
+
+      try {
+        const response = await fetch(API_URL);
+        const sorteos = await response.json();
+
+        if (!idSorteo) {
+          sorteoSelect.innerHTML = sorteos.map(s => `<option value="${s.id}">${s.id}</option>`).join('');
+          sorteoSelect.value = sorteos[0]?.id || ''; // Selecciona el primer sorteo si existe
+          if (sorteos.length > 0) cargarDatosSorteo(); // Llama otra vez para llenar datos
+          return;
+        }
+
+        const sorteoSeleccionado = sorteos.find(s => s.id === parseInt(idSorteo));
+        if (!sorteoSeleccionado) {
+          alert('Sorteo no encontrado. Selecciona un sorteo válido.');
+          return;
+        }
+
+        // Actualiza los datos en el tablero
+        document.getElementById('titulo-sorteo').innerText = sorteoSeleccionado.id;
+        document.getElementById('fecha-fin').innerText = sorteoSeleccionado.fechaFin;
+        document.getElementById('dias-restantes').innerText = calcularDiasRestantes(sorteoSeleccionado.fechaFin);
+        document.getElementById('recaudado').innerText = ((sorteoSeleccionado.precio ?? 0) * (sorteoSeleccionado.boletosVendidos ?? 0)).toFixed(2);
+        document.getElementById('vendidos').innerText = sorteoSeleccionado.boletosVendidos ?? 0;
+        document.getElementById('apartados').innerText = sorteoSeleccionado.boletosApartados ?? 0;
+        document.getElementById('disponibles').innerText = (sorteoSeleccionado.cantNumeros ?? 0) - (sorteoSeleccionado.boletosVendidos ?? 0) - (sorteoSeleccionado.boletosApartados ?? 0);
+
+
+        actualizarGrafica(sorteoSeleccionado);
+      } catch (error) {
+        console.error('Error al cargar los datos del sorteo:', error);
+      }
+    }
+
+    function calcularDiasRestantes(fechaFin) {
+      const fechaLimite = new Date(fechaFin);
+      const hoy = new Date();
+      const diferencia = fechaLimite - hoy;
+      return Math.max(Math.ceil(diferencia / (1000 * 60 * 60 * 24)), 0);
+    }
+/**
+    function actualizarGrafica(sorteo) {
+      const ctx = document.getElementById('boletosChart').getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Vendidos', 'Apartados', 'Disponibles'],
+          datasets: [{
+            label: 'Boletos',
+            data: [
+              sorteo.boletosVendidos,
+              sorteo.boletosApartados,
+              sorteo.cantNumeros - sorteo.boletosVendidos - sorteo.boletosApartados,
+            ],
+            backgroundColor: ['#007bff', '#ffc107', '#28a745'],
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+          },
+        },
+      });
+    }
+  **/
+
+    cargarDatosSorteo();
+
+  </script>
+</body>
+
+</html>

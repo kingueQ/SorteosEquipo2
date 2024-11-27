@@ -286,7 +286,7 @@ app.get('/api/v1/sorteos/listar/', async (req, res) => {
   const { idSorteo } = req.params;
 
   try {
-    const response = await axios.get(`http://localhost:3001//api/v1/sorteos/listar/`);
+    const response = await axios.get(`http://localhost:3001/api/v1/sorteos/listar/`);
     res.status(200).json(response.data);
   } catch (error) {
     handleErrorResponse(error, res, 'Error al consultar boletos');
