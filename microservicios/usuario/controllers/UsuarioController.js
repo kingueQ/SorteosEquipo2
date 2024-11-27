@@ -1,4 +1,5 @@
 const UsuarioService = require('../services/UsuarioService');
+const bcrypt = require('bcrypt');
 
 class UsuarioController {
   async createUsuario(req, res) {
@@ -50,8 +51,7 @@ class UsuarioController {
       res.status(500).json({ message: "Error al obtener usuario." });
     }
   }
-<<<<<<< Updated upstream
-=======
+
   async loginUsuario(req, res) {
     try {
       const { email, password } = req.body;
@@ -94,8 +94,7 @@ class UsuarioController {
       console.error("Error en el inicio de sesión:", error);
       res.status(500).json({ message: "Error interno del servidor." });
     }
-  }  
->>>>>>> Stashed changes
+  }
 }
 
 module.exports = new UsuarioController();

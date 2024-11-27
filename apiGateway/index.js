@@ -193,20 +193,75 @@ app.get('/api/v1/boletos/consultarTodos/:idSorteo', async (req, res) => {
   }
 });
 
+app.post('/api/v1/usuarios/crear', async (req, res) => {
+  const datosUsuario = req.body;
+
+  try {
+      // Llama al microservicio o a la API interna
+      const response = await axios.post('http://localhost:3003/api/v1/usuarios/crear', datosUsuario);
+
+      // Si todo está bien, responde con los datos del usuario creado y estado 201 (creado)
+      res.status(201).json(response.data);
+  } catch (error) {
+      console.error('Error al registrar usuario:', error.message);
+
+      if (error.response) {
+        console.error('Error tiene response:', error.response.data.message);
+          // Si el microservicio responde con error, propaga el estado y mensaje intactos
+          res.status(error.response.status || 500).json({ message: error.response.data.message || 'Error en el servidor' });
+      } else if (error.request) {
+          // Si no hubo respuesta del microservicio
+          console.error('No se recibió respuesta del servidor:', error.request);
+          res.status(500).json({ error: 'No se recibió respuesta del servidor' });
+      } else {
+          // Error en la configuración de la solicitud
+          console.error('Error al configurar la solicitud:', error.message);
+          res.status(500).json({ error: 'Error desconocido' });
+      }
+  }
+});
+
+app.post('/api/v1/usuarios/login', async (req, res) => {
+  const datosUsuario = req.body;
+
+  try {
+    // Redirige la solicitud al microservicio encargado de manejar el login
+    const response = await axios.post('http://localhost:3003/api/v1/usuarios/login', datosUsuario);
+
+    // Si el microservicio responde con éxito, envía la respuesta al cliente
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error.message);
+
+    if (error.response) {
+      // Error específico del microservicio
+      res.status(error.response.status || 500).json({ message: error.response.data.message || 'Error del microservicio' });
+    } else if (error.request) {
+      // El microservicio no responde
+      console.error('No se recibió respuesta del microservicio:', error.request);
+      res.status(503).json({ message: 'Servicio no disponible. Inténtalo más tarde.' });
+    } else {
+      // Error interno en la configuración de la solicitud
+      console.error('Error desconocido al configurar la solicitud:', error.message);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  }
+});
+
 app.get('/api/v1/usuarios/buscar/:email', async (req, res) => {
   const { email } = req.params; // Obtiene el ID del sorteo de los parámetros de la URL
   const datosUsuario = req.body;
 
   // Validación del ID (asegúrate de que es un número válido y positivo)
   if (!email || isNaN(email)) {
-    return res.status(400).json({ error: 'El email del sorteo debe cumplir con el formato esperado' });
+    return res.status(400).json({ error: 'El email del usuario debe cumplir con el formato esperado' });
   }
 
   try {
-    // Llama al microservicio o a la API interna para obtener el sorteo
+    // Llama al microservicio o a la API interna para obtener el usuario
     const response = await axios.get(`http://localhost:3003/api/v1/usuarios/buscar/${email}`, datosUsuario);
 
-    // Si todo está bien, responde con los datos del sorteo
+    // Si todo está bien, responde con los datos del usuario
     res.status(200).json(response.data);
   } catch (error) {
     console.error('Error al consultar sorteo:', error.message);
@@ -224,6 +279,17 @@ app.get('/api/v1/usuarios/buscar/:email', async (req, res) => {
       console.error('Error al configurar la solicitud:', error.message);
       res.status(500).json({ error: 'Error desconocido' });
     }
+  }
+});
+
+app.get('/api/v1/sorteos/listar/', async (req, res) => {
+  const { idSorteo } = req.params;
+
+  try {
+    const response = await axios.get(`http://localhost:3001//api/v1/sorteos/listar/`);
+    res.status(200).json(response.data);
+  } catch (error) {
+    handleErrorResponse(error, res, 'Error al consultar boletos');
   }
 });
 

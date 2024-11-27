@@ -137,6 +137,7 @@
         const data = await response.json();
 
         if (response.ok) {
+          // Accede al nombre del usuario en la respuesta
           const nombreUsuario = data.usuario?.nombre || 'usuario';
           alert(`Bienvenido, ${nombreUsuario}!`);
           window.location.href = '/inicio.html';
@@ -149,6 +150,7 @@
       }
     });
   </script>
+  
 </body>
 
 </html>

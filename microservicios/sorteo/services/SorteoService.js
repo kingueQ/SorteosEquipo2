@@ -244,9 +244,7 @@ class SorteoService {
             throw error; // Re-lanza el error para que sea manejado por el controlador
         }
     }
-<<<<<<< Updated upstream
-=======
-
+  
     static async listarSorteos() {
         try {
             // Llama al repositorio para buscar el sorteo por ID
@@ -265,7 +263,6 @@ class SorteoService {
             throw error; // Re-lanza el error para que sea manejado por el controlador
         }
     }
->>>>>>> Stashed changes
 }
 
 module.exports = SorteoService;
