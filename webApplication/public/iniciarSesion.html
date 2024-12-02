@@ -90,6 +90,7 @@
       </div>
       <button type="submit">Iniciar Sesión</button>
     </form>
+    <p>¿No tienes cuenta? <a href="registrarUsuario .html">Regístrate aquí</a></p>
     <p id="errorMessage" class="error-message"></p>
   </div>
   <script>
@@ -137,10 +138,15 @@
         const data = await response.json();
 
         if (response.ok) {
-          // Accede al nombre del usuario en la respuesta
           const nombreUsuario = data.usuario?.nombre || 'usuario';
+          const idOrganizador = data.usuario?.id || null; // Captura el ID del organizador
+
+          if (idOrganizador) {
+            localStorage.setItem('idOrganizador', idOrganizador); // Guarda el ID en localStorage
+          }
+
           alert(`Bienvenido, ${nombreUsuario}!`);
-          window.location.href = '/inicio.html';
+          window.location.href = '/inicio.html'; // Redirige al inicio
         } else {
           errorMessage.innerText = data.message || 'Correo o contraseña incorrectos.';
         }
@@ -150,7 +156,7 @@
       }
     });
   </script>
-  
+
 </body>
 
 </html>
