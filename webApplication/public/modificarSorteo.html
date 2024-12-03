@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar Sorteo</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/styles.css">
     <script>
         // Verificar si el usuario ha iniciado sesión
@@ -76,16 +77,30 @@
 
     <script>
         function cerrarSesion() {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Se cerrará la sesión.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, cerrar sesión",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
             localStorage.removeItem('idOrganizador');
             localStorage.removeItem('tipoUsuario');
             window.location.href = '/index.html';
         }
+    });
+ 
+}
 
         document.addEventListener('DOMContentLoaded', () => {
             const idOrganizador = localStorage.getItem('idOrganizador');
             if (!idOrganizador) {
                 alert('Error: No se pudo obtener el ID del organizador. Inicia sesión nuevamente.');
-                window.location.href = '/login.html';
+                window.location.href = '/iniciarSesion.html';
             }
 
             const form = document.getElementById('modificarSorteoForm');

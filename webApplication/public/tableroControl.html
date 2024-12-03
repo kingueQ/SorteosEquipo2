@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tablero de Control de Sorteo</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="css/styles.css">
   <script>
     // Verificar si el usuario ha iniciado sesión
@@ -90,10 +91,24 @@
   <script src="app.js"></script>
   <script>
     function cerrarSesion() {
-      localStorage.removeItem('idOrganizador');
-      localStorage.removeItem('tipoUsuario');
-      window.location.href = '/index.html';
-    }
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Se cerrará la sesión.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, cerrar sesión",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('idOrganizador');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = '/index.html';
+        }
+    });
+ 
+}
 
     const API_URL = 'http://localhost:3001/api/v1/sorteos/listar/';
     let selectedSorteoId;
