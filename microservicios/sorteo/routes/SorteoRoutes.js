@@ -12,5 +12,6 @@ router.put('/modificar/:id', SorteoController.modificarSorteo);
 router.put('/actualizar/:id', SorteoController.actualizarSorteo);
 router.get('/consultar/:id', SorteoController.consultarSorteo);
 router.get('/listar', SorteoController.listarSorteos);
+router.get('/listarVigentes', SorteoController.listarSorteosVigentes);
 
 module.exports = router;
