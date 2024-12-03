@@ -283,13 +283,22 @@ app.get('/api/v1/usuarios/buscar/:email', async (req, res) => {
 });
 
 app.get('/api/v1/sorteos/listar/', async (req, res) => {
-  const { idSorteo } = req.params;
 
   try {
     const response = await axios.get(`http://localhost:3001/api/v1/sorteos/listar/`);
     res.status(200).json(response.data);
   } catch (error) {
-    handleErrorResponse(error, res, 'Error al consultar boletos');
+    handleErrorResponse(error, res, 'Error al consultar sorteos');
+  }
+});
+
+app.get('/api/v1/sorteos/listarVigentes/', async (req, res) => {
+
+  try {
+    const response = await axios.get(`http://localhost:3001/api/v1/sorteos/listarVigentes/`);
+    res.status(200).json(response.data);
+  } catch (error) {
+    handleErrorResponse(error, res, 'Error al consultar sorteos');
   }
 });
 

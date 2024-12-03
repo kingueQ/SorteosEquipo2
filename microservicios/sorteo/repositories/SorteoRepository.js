@@ -2,14 +2,14 @@ const { pool } = require('../config/dbConfig'); // Asegúrate de que la ruta sea
 
 class SorteoRepository {
   static async crearSorteo(datosSorteo) {
-    const { idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaFinApartado, imagen, estado } = datosSorteo;
+    const { idOrganizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaFinApartado, imagen, estado } = datosSorteo;
 
     const query = `
-      INSERT INTO Sorteos (id_organizador, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado, imagen, estado)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO Sorteos (id_organizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado, imagen, estado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const valores = [idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaFinApartado, imagen, estado || 'activo'];
+    const valores = [idOrganizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaFinApartado, imagen, estado || 'activo'];
 
     try {
       const [result] = await pool.execute(query, valores);
@@ -24,6 +24,7 @@ class SorteoRepository {
       UPDATE Sorteos
       SET 
         id_organizador = ?, 
+        nombre = ?,
         cantNumeros = ?, 
         precio = ?, 
         fechaInicio = ?, 
@@ -36,6 +37,7 @@ class SorteoRepository {
 
     const valores = [
       datosSorteo.idOrganizador,
+      datosSorteo.nombre,
       datosSorteo.cantNumeros,
       datosSorteo.precio,
       datosSorteo.fechaInicio,
@@ -60,7 +62,7 @@ class SorteoRepository {
 
   static async consultarSorteoPorId(id) {
     const query = `
-      SELECT id, id_organizador AS idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
+      SELECT id, id_organizador AS idOrganizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
       FROM Sorteos
       WHERE id = ?
     `;
@@ -80,8 +82,29 @@ class SorteoRepository {
 
   static async listarSorteos(){
     const query = `
-      SELECT id, id_organizador AS idOrganizador, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
+      SELECT id, id_organizador AS idOrganizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
       FROM Sorteos
+    `;
+
+    try {
+      const [rows] = await pool.execute(query);
+
+      if (rows.length === 0) {
+        return null;
+      }
+
+      return rows;
+    } catch (error) {
+      throw new Error('Error en repository al consultar el sorteo: ' + error.message);
+    }
+  }
+
+  static async listarSorteosVigentes(){
+    const query = `
+      SELECT id, id_organizador AS idOrganizador, nombre, cantNumeros, precio, fechaInicio, fechaFin, fechaLimiteApartado AS fechaFinApartado, imagen, estado
+      FROM Sorteos
+      WHERE fechaInicio <= NOW()
+      AND fechaFin > NOW()
     `;
 
     try {

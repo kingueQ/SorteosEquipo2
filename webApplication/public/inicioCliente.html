@@ -4,79 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteos Disponibles</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        .container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .sorteo {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fafafa;
-        }
-        .sorteo img {
-            max-width: 150px;
-            max-height: 150px;
-            margin-right: 1rem;
-            border-radius: 5px;
-        }
-        .sorteo-details {
-            flex: 1;
-        }
-        .sorteo-details h3 {
-            margin: 0 0 0.5rem;
-        }
-        .sorteo-details p {
-            margin: 0.2rem 0;
-        }
-        .sorteo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .sorteo-item button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .sorteo-item button:hover {
-            background-color: #0056b3;
-        }
-        .loading {
-            text-align: center;
-            font-size: 1.2rem;
-        }
-        .error {
-            text-align: center;
-            color: red;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        // Verificar si el usuario ha iniciado sesión
+        window.onload = function() {
+            const idOrganizador = localStorage.getItem('idOrganizador');
+            const tipo = localStorage.getItem('tipoUsuario');
+            if (!idOrganizador) {
+                alert("Necesitas iniciar sesión");
+                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
+            }
+            if(tipo === 'cliente'){
+                
+            }else if(tipo === 'organizador'){
+                alert("Esta página es solo para clientes");
+                window.location.href = "inicio.html";
+            }else{
+                alert("Sesión no encontrada");
+                window.location.href = "index.html";
+            }
+        };
+    </script>
 </head>
 <body>
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo de la Plataforma">
+            <h1>Plataforma de Sorteos</h1>
+        </div>
+        <div class="nav-links">
+            <a href="verNumeros.html">Ver Numeros</a>
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
+        </div>
+    </nav>
     <div class="container">
         <h1>Sorteos Disponibles</h1>
         <div id="sorteosContainer">
@@ -85,10 +45,16 @@
     </div>
 
     <script>
+        function cerrarSesion() {
+            localStorage.removeItem('idOrganizador');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = '/index.html';
+        }
+        
         async function fetchSorteos() {
             const container = document.getElementById('sorteosContainer');
             try {
-                const response = await fetch('http://localhost:3000/api/v1/sorteos/listar');
+                const response = await fetch('http://localhost:3000/api/v1/sorteos/listarVigentes');
                 if (response.ok) {
                     const sorteos = await response.json();
                     if (sorteos.length > 0) {
