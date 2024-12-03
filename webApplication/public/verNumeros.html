@@ -4,101 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver Números del Sorteo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 2rem;
-            background-color: #f9f9f9;
-        }
-        .input-container {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        input[type="number"] {
-            padding: 0.5rem;
-            font-size: 1rem;
-            width: 150px;
-            margin-right: 10px;
-        }
-        button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .number-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            max-width: 800px;
-            margin: auto;
-        }
-        .number {
-            width: 60px;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .number.disponible { background-color: #28a745; }
-        .number.apartado { background-color: #ffc107; }
-        .number.vendido { background-color: #dc3545; }
-        .status {
-            text-align: center;
-            margin-bottom: 1rem;
-            font-weight: bold;
-        }
-        .sorteo-info {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 1.1rem;
-        }
-        .menu-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-        }
-        .menu-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        // Verificar si el usuario ha iniciado sesión
+        window.onload = function() {
+            const idOrganizador = localStorage.getItem('idOrganizador');
+            const tipo = localStorage.getItem('tipoUsuario');
+            if (!idOrganizador) {
+                alert("Necesitas iniciar sesión");
+                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
+            }
+            if(tipo === 'cliente'){
+                
+            }else if(tipo === 'organizador'){
+                alert("Esta página es solo para clientes");
+                window.location.href = "inicio.html";
+            }else{
+                alert("Sesión no encontrada");
+                window.location.href = "index.html";
+            }
+        };
+    </script>
 </head>
 <body>
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo de la Plataforma">
+            <h1>Plataforma de Sorteos</h1>
+        </div>
+        <div class="nav-links">
+            <a href="verNumeros.html">Ver Numeros</a>
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
+        </div>
+    </nav>
+
     <h2>Números Disponibles por Sorteo</h2>
 
-    <!-- Contenedor de entrada de ID del sorteo -->
-    <div class="input-container">
-        <input type="number" id="sorteoIdInput" placeholder="ID del sorteo" min="1" required>
-        <button onclick="cargarSorteo()">Ver Números</button>
-    </div>
-
-    <p class="status" id="statusMessage">Ingresa el ID del sorteo para ver los números.</p>
+    <p class="status" id="statusMessage">Cargando información del sorteo...</p>
 
     <div class="sorteo-info" id="sorteoInfo"></div>
 
     <div id="numberContainer" class="number-container"></div>
 
-    <a href="inicio.html" class="menu-button">Volver al Menú</a>
+    <a href="inicioCliente.html" class="menu-button">Volver al Menú</a>
 
     <script>
+        function cerrarSesion() {
+            localStorage.removeItem('idOrganizador');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = '/index.html';
+        }
+
         async function cargarSorteo() {
-            const sorteoId = document.getElementById('sorteoIdInput').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const sorteoId = urlParams.get('sorteoId');
             const statusMessage = document.getElementById('statusMessage');
             const container = document.getElementById('numberContainer');
             const sorteoInfo = document.getElementById('sorteoInfo');
@@ -109,7 +68,7 @@
             sorteoInfo.innerHTML = '';
 
             if (!sorteoId) {
-                statusMessage.textContent = 'Por favor, ingresa un ID de sorteo válido.';
+                statusMessage.textContent = 'No se proporcionó un ID de sorteo.';
                 return;
             }
 
@@ -122,6 +81,8 @@
 
                 // Mostrar la información del sorteo
                 sorteoInfo.innerHTML = `
+                    <h1> ${sorteo.nombre}</h1>
+                    <p></p>
                     <p><strong>Fecha de inicio:</strong> ${new Date(sorteo.fechaInicio).toLocaleDateString()}</p>
                     <p><strong>Fecha de fin de apartado:</strong> ${new Date(sorteo.fechaFinApartado).toLocaleDateString()}</p>
                     <p><strong>Fecha fin del sorteo:</strong> ${new Date(sorteo.fechaFin).toLocaleDateString()}</p>
@@ -176,6 +137,9 @@
                 container.appendChild(div);
             });
         }
+
+        // Llamar la función para cargar los datos al cargar la página
+        cargarSorteo();
     </script>
 </body>
 </html>

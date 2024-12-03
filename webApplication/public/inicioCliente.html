@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteos Disponibles</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        // Verificar si el usuario ha iniciado sesión
+        window.onload = function() {
+            const idOrganizador = localStorage.getItem('idOrganizador');
+            const tipo = localStorage.getItem('tipoUsuario');
+            if (!idOrganizador) {
+                alert("Necesitas iniciar sesión");
+                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
+            }
+            if(tipo === 'cliente'){
+                
+            }else if(tipo === 'organizador'){
+                alert("Esta página es solo para clientes");
+                window.location.href = "inicio.html";
+            }else{
+                alert("Sesión no encontrada");
+                window.location.href = "index.html";
+            }
+        };
+    </script>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo de la Plataforma">
+            <h1>Plataforma de Sorteos</h1>
+        </div>
+        <div class="nav-links">
+            <a href="verNumeros.html">Ver Numeros</a>
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Sorteos Disponibles</h1>
+        <div id="sorteosContainer">
+            <p class="loading">Cargando sorteos...</p>
+        </div>
+    </div>
+
+    <script>
+        function cerrarSesion() {
+            localStorage.removeItem('idOrganizador');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = '/index.html';
+        }
+        
+        async function fetchSorteos() {
+            const container = document.getElementById('sorteosContainer');
+            try {
+                const response = await fetch('http://localhost:3000/api/v1/sorteos/listarVigentes');
+                if (response.ok) {
+                    const sorteos = await response.json();
+                    if (sorteos.length > 0) {
+                        container.innerHTML = sorteos.map(sorteo => `
+                            <div class="sorteo">
+                                <img src="${sorteo.imagen || 'https://via.placeholder.com/150'}" alt="Imagen del sorteo">
+                                <div class="sorteo-details">
+                                    <h3>${sorteo.nombre || 'Sorteo sin nombre'}</h3>
+                                    <p><strong>Precio por Número:</strong> $${sorteo.precio}</p>
+                                    <p><strong>Fecha Inicio:</strong> ${new Date(sorteo.fechaInicio).toLocaleDateString()}</p>
+                                    <p><strong>Fecha Fin:</strong> ${new Date(sorteo.fechaFin).toLocaleDateString()}</p>
+                                    <p><strong>Estado:</strong> ${sorteo.estado || 'No especificado'}</p>
+                                    <div class="sorteo-item">
+                                        <button onclick="verNumeros(${sorteo.id})">Ver Números</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        container.innerHTML = '<p>No hay sorteos disponibles en este momento.</p>';
+                    }
+                } else {
+                    container.innerHTML = '<p class="error">Error al cargar los sorteos. Intenta nuevamente.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching sorteos:', error);
+                container.innerHTML = '<p class="error">Error de conexión. Por favor, intenta más tarde.</p>';
+            }
+        }
+
+        function verNumeros(sorteoId) {
+            // Redirigir a la página de ver números con el ID del sorteo como parámetro
+            window.location.href = `verNumeros.html?sorteoId=${sorteoId}`;
+        }
+
+        fetchSorteos();
+    </script>
+</body>
+</html>

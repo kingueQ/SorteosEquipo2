@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablero de Control de Sorteo</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    // Verificar si el usuario ha iniciado sesión
+    window.onload = function () {
+      const idOrganizador = localStorage.getItem('idOrganizador');
+      const tipo = localStorage.getItem('tipoUsuario');
+      if (!idOrganizador) {
+        alert("Necesitas iniciar sesión");
+        window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
+      }
+      if (tipo === 'organizador') {
+
+      } else if (tipo === 'cliente') {
+        alert("Esta página es solo para organizadores");
+        window.location.href = "inicioCliente.html";
+      } else {
+        alert("Sesión no encontrada");
+        window.location.href = "index.html";
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <nav>
+    <div class="logo">
+      <img src="logo.png" alt="Logo de la Plataforma">
+      <h1>Plataforma de Sorteos</h1>
+    </div>
+    <div class="nav-links">
+      <a href="crearSorteo.html">Crear Nuevo Sorteo</a>
+      <a href="tableroControl.html">Tablero de Control</a>
+      <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
+    </div>
+  </nav>
+  <div class="dashboard-container">
+    <h1>Tablero de Control</h1>
+
+    <!-- Selección de sorteo -->
+    <div class="select-sorteo">
+      <label for="sorteo">Seleccionar Sorteo:</label>
+      <select id="sorteo" onchange="cargarDatosSorteo()">
+        <!-- Aquí se llenarán las opciones dinámicamente -->
+      </select>
+    </div>
+
+    <!-- Información del sorteo -->
+    <div class="sorteo-info">
+      <h2 id="titulo-sorteo">Nombre del Sorteo</h2>
+      <p><strong>Fecha de Fin:</strong> <span id="fecha-fin"></span></p>
+      <p><strong>Días Restantes:</strong> <span id="dias-restantes"></span></p>
+    </div>
+
+    <!-- Estado de los boletos -->
+    <div class="boletos-status">
+      <h3>Estado de los Boletos</h3>
+      <div class="status-cards">
+        <div class="card">
+          <h4>Recaudación Total</h4>
+          <p>$<span id="recaudado">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Vendidos</h4>
+          <p><span id="vendidos">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Apartados</h4>
+          <p><span id="apartados">0</span></p>
+        </div>
+        <div class="card">
+          <h4>Boletos Disponibles</h4>
+          <p><span id="disponibles">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón para modificar el sorteo -->
+    <div class="modify-sorteo">
+      <button id="modificarSorteoButton" onclick="redirigirModificar()">Modificar Sorteo</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    function cerrarSesion() {
+      localStorage.removeItem('idOrganizador');
+      localStorage.removeItem('tipoUsuario');
+      window.location.href = '/index.html';
+    }
+
+    const API_URL = 'http://localhost:3001/api/v1/sorteos/listar/';
+    let selectedSorteoId;
+
+    async function cargarDatosSorteo() {
+      const sorteoSelect = document.getElementById('sorteo');
+      const idSorteo = sorteoSelect.value;
+
+      try {
+        const response = await fetch(API_URL);
+        const sorteos = await response.json();
+
+        if (!idSorteo) {
+          sorteoSelect.innerHTML = sorteos.map(s => `<option value="${s.id}">${s.id}</option>`).join('');
+          sorteoSelect.value = sorteos[0]?.id || ''; // Selecciona el primer sorteo si existe
+          selectedSorteoId = sorteos[0]?.id || null;
+          if (sorteos.length > 0) cargarDatosSorteo(); // Llama otra vez para llenar datos
+          return;
+        }
+
+        selectedSorteoId = parseInt(idSorteo);
+        const sorteoSeleccionado = sorteos.find(s => s.id === selectedSorteoId);
+
+        if (!sorteoSeleccionado) {
+          alert('Sorteo no encontrado. Selecciona un sorteo válido.');
+          return;
+        }
+
+        // Actualiza los datos en el tablero
+        document.getElementById('titulo-sorteo').innerText = sorteoSeleccionado.nombre;
+        document.getElementById('fecha-fin').innerText = formatDateToInput(sorteoSeleccionado.fechaFin)
+        document.getElementById('dias-restantes').innerText = calcularDiasRestantes(sorteoSeleccionado.fechaFin);
+        document.getElementById('recaudado').innerText = ((sorteoSeleccionado.precio ?? 0) * (sorteoSeleccionado.boletosVendidos ?? 0)).toFixed(2);
+        document.getElementById('vendidos').innerText = sorteoSeleccionado.boletosVendidos ?? 0;
+        document.getElementById('apartados').innerText = sorteoSeleccionado.boletosApartados ?? 0;
+        document.getElementById('disponibles').innerText = (sorteoSeleccionado.cantNumeros ?? 0) - (sorteoSeleccionado.boletosVendidos ?? 0) - (sorteoSeleccionado.boletosApartados ?? 0);
+
+        const currentDate = new Date();
+
+        // Comparar la fecha de fin del sorteo con la fecha actual
+        if (new Date(sorteoSeleccionado.fechaFin) <= currentDate) {
+          // Desactivar el botón de modificar si la fecha de fin es igual o menor a la fecha actual
+          const botonModificar = document.getElementById('modificarSorteoButton');
+          botonModificar.disabled = true; // Desactivar el botón
+          botonModificar.style.opacity = 0.5; // Opcional: hacer que el botón se vea deshabilitado
+        } else {
+          // Asegurarse de que el botón esté activo si la fecha de fin es mayor que la actual
+          const botonModificar = document.getElementById('modificarSorteoButton');
+          botonModificar.disabled = false; // Activar el botón
+          botonModificar.style.opacity = 1; // Opcional: restaurar la opacidad del botón
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del sorteo:', error);
+      }
+    }
+
+    function calcularDiasRestantes(fechaFin) {
+      const fechaLimite = new Date(fechaFin);
+      const hoy = new Date();
+      const diferencia = fechaLimite - hoy;
+      return Math.max(Math.ceil(diferencia / (1000 * 60 * 60 * 24)), 0);
+    }
+
+    function formatDateToInput(dateString) {
+      if (!dateString) return ''; // Si la fecha es null o undefined, devolver vacío.
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Mes de 2 dígitos
+      const day = String(date.getDate()).padStart(2, '0'); // Día de 2 dígitos
+      return `${year}-${month}-${day}`;
+    }
+
+    function redirigirModificar() {
+      if (selectedSorteoId) {
+        window.location.href = `modificarSorteo.html?id=${selectedSorteoId}`;
+      } else {
+        alert('Selecciona un sorteo antes de continuar.');
+      }
+    }
+
+    cargarDatosSorteo();
+  </script>
+</body>
+
+</html>

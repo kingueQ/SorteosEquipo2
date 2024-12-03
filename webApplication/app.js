@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta principal que devuelve el archivo de inicio del front-end
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'inicio.html')); // Asegúrate de que 'index.html' esté en la carpeta 'public'
+  res.sendFile(path.join(__dirname, 'public', 'index.html')); // Asegúrate de que 'index.html' esté en la carpeta 'public'
 });
 
 // Rutas adicionales para otras páginas o funcionalidades del front-end

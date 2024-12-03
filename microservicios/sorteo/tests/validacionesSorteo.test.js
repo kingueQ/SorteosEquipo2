@@ -23,7 +23,7 @@ describe('Validaciones de SorteoService', () => {
     });
 
     it('Debe validar correctamente la fecha de inicio', () => {
-        expect(SorteoService.validarFechaInicio('2024-12-01')).toBeNull();
+        expect(SorteoService.validarFechaInicio('2024-12-20')).toBeNull();
         expect(SorteoService.validarFechaInicio('2020-01-01')).toBe('La fecha de inicio no debe ser anterior a la fecha actual');
     });
 

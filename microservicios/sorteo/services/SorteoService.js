@@ -10,6 +10,20 @@ class SorteoService {
         return null;
     }
 
+    // Método para validar el nombre
+    static validarNombre(nombre) {
+        if (nombre !== undefined) {
+            if (typeof nombre !== 'string' || nombre.trim() === '') {
+                return 'El nombre no puede estar vacío';
+            } else {
+                if(nombre.length>50){
+                    return 'El nombre debe tener 50 o menos caracteres';
+                }
+            }
+        }
+        return null;
+    }
+
     // Método para validar la cantidad de números
     static validarCantidadNumeros(cantNumeros) {
         if (!cantNumeros || !Number.isInteger(cantNumeros) || cantNumeros <= 0) {
@@ -139,6 +153,7 @@ class SorteoService {
 
         // Validaciones individuales
         errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.nombre = SorteoService.validarNombre(datosSorteo.nombre);
         errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
         errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
         errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
@@ -168,6 +183,7 @@ class SorteoService {
 
         // Validaciones individuales
         errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.nombre = SorteoService.validarNombre(datosSorteo.nombre);
         errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
         errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
         errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
@@ -196,6 +212,7 @@ class SorteoService {
 
         // Validaciones individuales
         errores.idOrganizador = SorteoService.validarIdOrganizador(datosSorteo.idOrganizador);
+        errores.nombre = SorteoService.validarNombre(datosSorteo.nombre);
         errores.cantNumeros = SorteoService.validarCantidadNumeros(datosSorteo.cantNumeros);
         errores.precio = SorteoService.validarPrecio(datosSorteo.precio);
         errores.fechaInicio = SorteoService.validarFechaInicio(datosSorteo.fechaInicio);
@@ -252,6 +269,25 @@ class SorteoService {
 
             // Si no se encuentra el sorteo, lanza un error
             if (sorteos.length <= 0) {
+                const error = new Error('Ningún sorteo fue encontrado');
+                error.status = 404; // Código de estado 404 para indicar que no se encontró el sorteo
+                throw error;
+            }
+
+            return sorteos; // Devuelve el sorteo encontrado
+        } catch (error) {
+            console.error('Error en service al listar sorteos:', error.message);
+            throw error; // Re-lanza el error para que sea manejado por el controlador
+        }
+    }
+
+    static async listarSorteosVigentes() {
+        try {
+            // Llama al repositorio para buscar el sorteo por ID
+            const sorteos = await SorteoRepository.listarSorteosVigentes();
+
+            // Si no se encuentra el sorteo, lanza un error
+            if (sorteos==null || sorteos.length <= 0) {
                 const error = new Error('Ningún sorteo fue encontrado');
                 error.status = 404; // Código de estado 404 para indicar que no se encontró el sorteo
                 throw error;

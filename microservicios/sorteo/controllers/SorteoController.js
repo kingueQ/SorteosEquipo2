@@ -74,12 +74,29 @@ class SorteoController {
         }
     }
 
-    static async listarSorteos(){
+    static async listarSorteos(req, res) { // Asegúrate de incluir los parámetros req, res
         try {
             // Llama al servicio para consultar el sorteo
-            const sorteos = await SorteoService.listarSorteos;
+            const sorteos = await SorteoService.listarSorteos();
     
-            if (sorteos.length<=0) {
+            if (sorteos.length <= 0) {
+                // Si no se encuentra el sorteo, devuelve un error 404
+                return res.status(404).json({ error: 'Ningún sorteo fue encontrado' });
+            }
+    
+            res.status(200).json(sorteos); // Devuelve los datos del sorteo encontrado
+        } catch (error) {
+            console.error('Error en controller al listar sorteos:', error.message);
+            res.status(error.status || 500).json({ message: error.message });
+        }
+    }
+    
+    static async listarSorteosVigentes(req, res) { // Asegúrate de incluir los parámetros req, res
+        try {
+            // Llama al servicio para consultar el sorteo
+            const sorteos = await SorteoService.listarSorteosVigentes();
+    
+            if (sorteos.length <= 0) {
                 // Si no se encuentra el sorteo, devuelve un error 404
                 return res.status(404).json({ error: 'Ningún sorteo fue encontrado' });
             }
