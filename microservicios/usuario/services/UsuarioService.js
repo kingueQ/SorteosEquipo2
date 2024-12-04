@@ -23,6 +23,20 @@ class UsuarioService {
       throw error;
     }
 
+    if (await this.getUsuarioByEmail(usuario.correo)) {
+      errores.duplicado = 'Ya existe un usuario registrado con ese correo';
+      const error = new Error(JSON.stringify(errores));
+      error.message = errores;
+      error.status = 400;
+      throw error;
+    }
+    if (await this.getUsuarioByTelefono(usuario.telefono)) {
+      errores.duplicado = 'Ya existe un usuario registrado con ese telefono';
+      const error = new Error(JSON.stringify(errores));
+      error.message = errores;
+      error.status = 400;
+      throw error;
+    }
     // Hash de la contraseña antes de guardarla
     usuario.contrasena = await bcrypt.hash(usuario.contrasena, 10);
     return UsuarioRepository.create(usuario);
@@ -89,6 +103,9 @@ class UsuarioService {
     }
     if (!/[0-9]/.test(contrasena)) {
       return 'La contraseña debe incluir al menos un número.';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>_-]/.test(contrasena)) {
+      return 'La contraseña debe incluir al menos un carácter especial.';
     }
     return null;
   }
