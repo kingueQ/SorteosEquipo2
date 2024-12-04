@@ -52,14 +52,14 @@ class SorteoService {
             return 'La fecha de inicio debe ser una fecha válida';
         }
 
-        // Validar rango de años (1900-2100)
-        if (year < 1900 || year > 2100) {
-            return 'El año de la fecha de inicio debe estar entre 1900 y 2100';
-        }
-
         // Validar que la fecha no sea anterior a hoy
         if (fechaInicioObj < hoy) {
             return 'La fecha de inicio no debe ser anterior a la fecha actual';
+        }
+
+        // Validar rango de años (1900-2100)
+        if (year < 2024 || year > 2100) {
+            return 'El año de la fecha de inicio debe estar entre 2024 y 2100';
         }
 
         return null;
@@ -78,8 +78,8 @@ class SorteoService {
         }
 
         // Validar rango de años (1900-2100)
-        if (year2 < 1900 || year2 > 2100) {
-            return 'El año de la fecha de fin debe estar entre 1900 y 2100';
+        if (year2 < 2024 || year2 > 2100) {
+            return 'El año de la fecha de fin debe estar entre 2024 y 2100';
         }
 
         // Validar que la fecha de fin sea posterior a la fecha de inicio
@@ -106,8 +106,8 @@ class SorteoService {
         }
 
         // Validar rango de años (1900-2100)
-        if (year3 < 1900 || year3 > 2100) {
-            return 'El año de la fecha límite de apartado debe estar entre 1900 y 2100';
+        if (year3 < 2024 || year3 > 2100) {
+            return 'El año de la fecha límite de apartado debe estar entre 2024 y 2100';
         }
 
         // Validar que la fecha de fin de apartado sea posterior a la fecha de inicio
