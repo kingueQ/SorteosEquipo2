@@ -65,7 +65,7 @@ class UsuarioService {
 
   // Validación de correo
   validateCorreo(correo) {
-    const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}$/;
     if (!correo) {
       return 'El correo es obligatorio.';
     }

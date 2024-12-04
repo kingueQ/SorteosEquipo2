@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Usuario</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -55,22 +56,27 @@
             const input = e.target;
             input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').substring(0, 100);
         });
-
+    
         // Validación del campo "Teléfono"
         document.getElementById('telefono').addEventListener('input', (e) => {
             const input = e.target;
             input.value = input.value.replace(/[^0-9]/g, '').substring(0, 10);
         });
-
+    
         // Validación del campo "Correo Electrónico" en el cliente
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}$/;
         document.getElementById('correo').addEventListener('blur', (e) => {
             const input = e.target;
             if (!emailRegex.test(input.value)) {
-                alert('Por favor, ingresa un correo válido.');
+                Swal.fire({
+                        title: "Correo invalido",
+                        text: `Por favor, ingrese un correo válido, ${formData.nombre}!`,
+                        icon: "error",
+                        confirmButtonText: "Continuar"
+                    })
             }
         });
-
+    
         // Validación del campo "Contraseña"
         document.getElementById('contrasena').addEventListener('input', (e) => {
             const input = e.target;
@@ -78,11 +84,11 @@
                 input.value = input.value.substring(0, 15);
             }
         });
-
+    
         // Manejador del formulario
         document.getElementById('registrarUsuarioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
+    
             const formData = {
                 nombre: document.getElementById('nombre').value.trim(),
                 correo: document.getElementById('correo').value.trim(),
@@ -90,7 +96,7 @@
                 contrasena: document.getElementById('contrasena').value.trim(),
                 tipo: document.getElementById('tipo').value
             };
-
+    
             try {
                 const response = await fetch('http://localhost:3000/api/v1/usuarios/crear', {
                     method: 'POST',
@@ -99,59 +105,71 @@
                     },
                     body: JSON.stringify(formData)
                 });
-
+    
                 if (response.ok) {
-                    displayMessage(['Usuario registrado con éxito. Redirigiendo al login...'], 'success');
-                    setTimeout(() => {
+                    const result = await response.json();
+    
+                    // Mostrar alerta de éxito con SweetAlert2
+                    Swal.fire({
+                        title: "¡Registro exitoso!",
+                        text: `¡Bienvenido, ${formData.nombre}!`,
+                        icon: "success",
+                        confirmButtonText: "Continuar"
+                    }).then(() => {
+                        // Redirigir a otra página después de cerrar el diálogo
                         window.location.href = 'iniciarSesion.html';
-                    }, 3000);
+                    });
                 } else {
                     try {
-                            const error = await response.json();
-                            console.log('Error response object:', error);
-
-                            let errorMessages = [];
-
-                            if (typeof error === 'object') {
-                                if (typeof error.message === 'object') {
-                                    // Procesa los mensajes de error por campo
-                                    errorMessages = Object.entries(error.message).map(
-                                        ([field, message]) => `${field}: ${message}`
-                                    );
-                                } else if (typeof error.message === 'string') {
-                                    errorMessages.push(error.message);
-                                } else {
-                                    // Procesa cualquier otro formato de error
-                                    errorMessages = Object.entries(error.message).map(
-                                        ([field, message]) => `${field}: ${message}`
-                                    );
-                                }
-                            } else {
-                                errorMessages.push(error.message || error.error || 'Error desconocido');
+                        // Procesar errores específicos devueltos por el servidor
+                        const error = await response.json();
+                        let errorMessages = [];
+    
+                        if (typeof error === 'object' && error.message) {
+                            if (typeof error.message === 'object') {
+                                // Si los mensajes están estructurados por campo
+                                errorMessages = Object.entries(error.message).map(
+                                    ([field, message]) => `${field}: ${message}`
+                                );
+                            } else if (typeof error.message === 'string') {
+                                // Si hay un mensaje de error genérico
+                                errorMessages.push(error.message);
                             }
-
-                            displayMessage(['Error al registrar el usuario:', ...errorMessages], 'error');
-                        } catch (jsonError) {
-                            displayMessage(['Error al registrar el usuario:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
+                        } else {
+                            errorMessages.push("Error desconocido al procesar la solicitud.");
                         }
+    
+                        // Mostrar los mensajes de error en una alerta
+                        Swal.fire({
+                            title: "Error al registrar",
+                            html: errorMessages.map(msg => `<li>${msg}</li>`).join(''),
+                            icon: "error",
+                            confirmButtonText: "Entendido"
+                        });
+                    } catch (jsonError) {
+                        // Error al analizar la respuesta del servidor
+                        console.error('Error al analizar respuesta JSON:', jsonError);
+                        Swal.fire({
+                            title: "Error al registrar",
+                            text: "Hubo un error desconocido. Por favor, inténtalo de nuevo.",
+                            icon: "error",
+                            confirmButtonText: "Entendido"
+                        });
+                    }
                 }
-            } catch (err) {
-                console.error('Error en la solicitud:', err);
-                displayMessage(['Error de conexión. Intenta nuevamente.'], 'error');
+            } catch (error) {
+                // Manejar errores de conexión o problemas del cliente
+                console.error('Error al enviar datos:', error);
+                Swal.fire({
+                    title: "Error en el servidor",
+                    text: "Hubo un error al registrar. Por favor, inténtalo de nuevo.",
+                    icon: "error",
+                    confirmButtonText: "Entendido"
+                });
             }
         });
-
-        // Función para mostrar mensajes
-        function displayMessage(messages, type) {
-            const messageContainer = document.getElementById('messageContainer');
-            const formattedMessages = messages.map(msg => `<li>${msg}</li>`).join('');
-            messageContainer.innerHTML = `
-                <div class="alert ${type}">
-                    <ul>${formattedMessages}</ul>
-                </div>
-            `;
-        }
     </script>
+    
 </body>
 
 </html>

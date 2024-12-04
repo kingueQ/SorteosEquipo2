@@ -8,23 +8,48 @@
     <link rel="stylesheet" href="css/styles.css">
     <script>
         // Verificar si el usuario ha iniciado sesión
-        window.onload = function() {
-            const idOrganizador = localStorage.getItem('idOrganizador');
-            const tipo = localStorage.getItem('tipoUsuario');
-            if (!idOrganizador) {
-                alert("Necesitas iniciar sesión");
-                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
-            }
-            if(tipo === 'cliente'){
-                
-            }else if(tipo === 'organizador'){
-                alert("Esta página es solo para clientes");
-                window.location.href = "inicio.html";
-            }else{
-                alert("Sesión no encontrada");
-                window.location.href = "index.html";
-            }
-        };
+        window.onload = function () {
+    const idOrganizador = localStorage.getItem('idOrganizador');
+    const tipo = localStorage.getItem('tipoUsuario');
+
+    if (!idOrganizador) {
+        window.location.href = 'iniciarSesion.html';
+        Swal.fire({
+            title: 'Inicia sesión',
+            text: 'Necesitas iniciar sesión para acceder a esta página.',
+            icon: 'warning',
+            confirmButtonText: 'Ir al inicio de sesión',
+        }).then(() => {
+            window.location.href = 'iniciarSesion.html'; // Cambia a "index.html" si es necesario
+        });
+        return; // Detener ejecución
+    }
+
+    if (tipo === 'cliente') {
+        // Aquí no hay acción, pero puedes agregar lógica adicional si es necesario
+    } else if (tipo === 'organizador') {
+        window.location.href = 'iniciarSesion.html';
+        Swal.fire({
+            title: 'Acceso denegado',
+            text: 'Esta página es solo para clientes.',
+            icon: 'error',
+            confirmButtonText: 'Volver al inicio',
+        }).then(() => {
+            window.location.href = 'inicio.html';
+        });
+    } else {
+        window.location.href = 'iniciarSesion.html';
+        Swal.fire({
+            title: 'Sesión no encontrada',
+            text: 'Por favor, inicia sesión nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'Ir al inicio',
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
+    }
+};
+
     </script>
 </head>
 <body>

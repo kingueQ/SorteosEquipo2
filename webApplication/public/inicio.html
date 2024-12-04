@@ -8,23 +8,41 @@
     <link rel="stylesheet" href="css/styles.css">
     <script>
         // Verificar si el usuario ha iniciado sesión
-        window.onload = function() {
-            const idOrganizador = localStorage.getItem('idOrganizador');
-            const tipo = localStorage.getItem('tipoUsuario');
-            if (!idOrganizador) {
-                alert("Necesitas iniciar sesión");
-                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
-            }
-            if(tipo === 'organizador'){
-                
-            }else if(tipo === 'cliente'){
-                alert("Esta página es solo para organizadores");
-                window.location.href = "inicioCliente.html";
-            }else{
-                alert("Sesión no encontrada");
-                window.location.href = "index.html";
-            }
-        };
+        window.onload = function () {
+    const idOrganizador = localStorage.getItem('idOrganizador');
+    const tipo = localStorage.getItem('tipoUsuario');
+
+    if (!idOrganizador) {
+        Swal.fire({
+            title: "Sesión no encontrada",
+            text: "Por favor, inicia sesión para continuar.",
+            icon: "warning",
+            confirmButtonText: "Ir a inicio de sesión"
+        }).then(() => {
+            window.location.href = "iniciarSesion.html";
+        });
+    } else if (tipo === 'organizador') {
+        // El usuario es un organizador, se permite el acceso
+    } else if (tipo === 'cliente') {
+        Swal.fire({
+            title: "Acceso restringido",
+            text: "Esta página es solo para organizadores.",
+            icon: "error",
+            confirmButtonText: "Ir a inicio de cliente"
+        }).then(() => {
+            window.location.href = "inicioCliente.html";
+        });
+    } else {
+        Swal.fire({
+            title: "Sesión no encontrada",
+            text: "Por favor, inicia sesión nuevamente.",
+            icon: "warning",
+            confirmButtonText: "Ir a inicio"
+        }).then(() => {
+            window.location.href = "index.html";
+        });
+    }
+};
     </script>
 </head>
 <body>
