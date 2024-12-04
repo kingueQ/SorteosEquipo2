@@ -15,7 +15,7 @@
             const tipo = localStorage.getItem('tipoUsuario');
             if (!idOrganizador) {
                 alert("Necesitas iniciar sesión");
-                window.location.href = "iniciarSesion.html"; // Cambiar a "index.html" si lo prefieres
+                window.location.href = "iniciarSesion.html";
             }
             if (tipo === 'organizador') {
 
@@ -39,7 +39,7 @@
         <div class="nav-links">
             <a href="crearSorteo.html">Crear Nuevo Sorteo</a>
             <a href="tableroControl.html">Tablero de Control</a>
-            <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
+            <a href="#" onclick="cerrarSesion()">Cerrar Sesión</a>
         </div>
     </nav>
 
@@ -47,13 +47,13 @@
     <div class="form-container">
         <form id="crearSorteoForm">
             <label for="nombre">Nombre del Sorteo</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" name="nombre" maxlength="30" required>
 
             <label for="cantNumeros">Cantidad de Números</label>
             <input type="number" id="cantNumeros" name="cantNumeros" required>
 
             <label for="precio">Precio por Número</label>
-            <input type="number" step="0.01" id="precio" name="precio" max="1000" required>
+            <input type="number" step="0.01" id="precio" name="precio" required>
 
             <label for="fechaInicio">Fecha de Inicio</label>
             <input type="date" id="fechaInicio" name="fechaInicio" required>
@@ -76,47 +76,93 @@
 
     <script>
         function cerrarSesion() {
-    Swal.fire({
-        title: "¿Estás seguro?",
-        text: "Se cerrará la sesión.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, cerrar sesión",
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem('idOrganizador');
-            localStorage.removeItem('tipoUsuario');
-            window.location.href = '/index.html';
-        }
-    });
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Se cerrará la sesión.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, cerrar sesión",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('idOrganizador');
+                    localStorage.removeItem('tipoUsuario');
+                    window.location.href = '/index.html';
+                }
+            });
  
-}
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const idOrganizador = localStorage.getItem('idOrganizador'); // Recupera el ID del organizador
+            const idOrganizador = localStorage.getItem('idOrganizador');
             if (!idOrganizador) {
                 alert('Error: No se pudo obtener el ID del organizador. Inicia sesión nuevamente.');
-                window.location.href = '/login.html'; // Redirige al login si no hay ID
+                window.location.href = '/login.html';
+            }
+
+            const nombreInput = document.getElementById('nombre');
+            nombreInput.addEventListener('input', () => {
+                nombreInput.value = nombreInput.value
+                    .replace(/[^a-zA-Z0-9\s]/g, '') // Permite letras, números y espacios
+                    .slice(0, 30); // Limita a 30 caracteres
+            });
+
+            const cantNumerosInput = document.getElementById('cantNumeros');
+            cantNumerosInput.addEventListener('input', () => {
+                cantNumerosInput.value = cantNumerosInput.value
+                    .replace(/[^0-9]/g, ''); // Solo permite números positivos
+                if (parseInt(cantNumerosInput.value) > 1000) {
+                    cantNumerosInput.value = 1000; // Límite máximo
+                }
+            });
+
+            const precioInput = document.getElementById('precio');
+            precioInput.addEventListener('input', () => {
+                precioInput.value = precioInput.value
+                    .replace(/[^0-9.]/g, '') // Permite solo números y un punto
+                    .replace(/(\..*?)\..*/g, '$1'); // Evita más de un punto decimal
+                if (parseFloat(precioInput.value) > 3000) {
+                    precioInput.value = 3000; // Límite máximo
+                }
+            });
+
+            const fechaInputs = ['fechaInicio', 'fechaFin', 'fechaFinApartado'].map(id => document.getElementById(id));
+
+            fechaInputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    const fechaIngresada = new Date(input.value);
+                    if (!input.value || isNaN(fechaIngresada.getTime()) || fechaIngresada.getFullYear() > 2100) {
+                        input.value = formatDateToInput(new Date()); // Corrige con la fecha actual
+                    } else {
+                        
+                    }
+                });
+            });
+
+            function formatDateToInput(dateString) {
+                if (!dateString) return ''; // Si la fecha es null o undefined, devolver vacío.
+                const date = new Date(dateString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Mes de 2 dígitos
+                const day = String(date.getDate()).padStart(2, '0'); // Día de 2 dígitos
+                return `${year}-${month}-${day}`;
             }
 
             document.getElementById('crearSorteoForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 const formData = {
-                    idOrganizador: parseInt(idOrganizador), // Usa el ID almacenado
-                    nombre: document.getElementById('nombre').value,
-                    cantNumeros: parseInt(document.getElementById('cantNumeros').value),
-                    precio: parseFloat(document.getElementById('precio').value),
+                    idOrganizador: parseInt(idOrganizador),
+                    nombre: nombreInput.value.trim(),
+                    cantNumeros: parseInt(cantNumerosInput.value),
+                    precio: parseFloat(precioInput.value),
                     fechaInicio: document.getElementById('fechaInicio').value,
                     fechaFin: document.getElementById('fechaFin').value,
                     fechaFinApartado: document.getElementById('fechaFinApartado').value,
                     imagen: document.getElementById('imagen').value.trim(),
                     estado: 'activo',
                 };
-
                 try {
                     const response = await fetch('http://localhost:3000/api/v1/sorteos/crear', {
                         method: 'POST',
@@ -125,10 +171,10 @@
                         },
                         body: JSON.stringify(formData),
                     });
-
                     if (response.ok) {
                         const result = await response.json();
                         displayMessage(['Sorteo creado con éxito: ID ' + result.id], 'success');
+                        document.getElementById('crearSorteoForm').reset();
                     } else {
                         try {
                             const error = await response.json();
@@ -146,7 +192,7 @@
                                     errorMessages.push(error.message);
                                 } else {
                                     // Procesa cualquier otro formato de error
-                                    errorMessages = Object.entries(error).map(
+                                    errorMessages = Object.entries(error.message).map(
                                         ([field, message]) => `${field}: ${message}`
                                     );
                                 }
@@ -161,25 +207,19 @@
                     }
                 } catch (err) {
                     console.error('Error en la solicitud:', err);
-                    displayMessage(['Error de conexión, intenta nuevamente.'], 'error');
+                    displayMessage(['Error de conexión. Intenta nuevamente.'], 'error');
                 }
             });
-        });
 
-        function displayMessage(messages, type) {
-            const messageContainer = document.getElementById('messageContainer');
-
-            if (Array.isArray(messages)) {
-                const formattedMessages = messages.map(msg => `<li>${msg}</li>`).join('');
+            function displayMessage(messages, type) {
+                const messageContainer = document.getElementById('messageContainer');
                 messageContainer.innerHTML = `
-                    <div class="alert ${type}">
-                        <ul>${formattedMessages}</ul>
-                    </div>
-                `;
-            } else {
-                messageContainer.innerHTML = `<div class="alert ${type}">${messages}</div>`;
+                <div class="alert ${type}">
+                    <ul>${messages.map(msg => `<li>${msg}</li>`).join('')}</ul>
+                </div>
+            `;
             }
-        }
+        });
     </script>
 
 </body>

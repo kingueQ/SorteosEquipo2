@@ -34,7 +34,6 @@
             <h1>Plataforma de Sorteos</h1>
         </div>
         <div class="nav-links">
-            <a href="verNumeros.html">Ver Numeros</a>
             <a href="#" onclick="cerrarSesion()">Cerrar Sesion</a>
         </div>
     </nav>
@@ -92,7 +91,7 @@
                         container.innerHTML = '<p>No hay sorteos disponibles en este momento.</p>';
                     }
                 } else {
-                    container.innerHTML = '<p class="error">Error al cargar los sorteos. Intenta nuevamente.</p>';
+                    container.innerHTML = '<p>No hay sorteos disponibles en este momento.</p>';
                 }
             } catch (error) {
                 console.error('Error fetching sorteos:', error);

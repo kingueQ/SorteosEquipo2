@@ -43,58 +43,58 @@
         </div>
     </nav>
     <h2>Modificar Sorteo</h2>
-    <form id="modificarSorteoForm">
-        <!-- Campos del formulario -->
-        <label for="idSorteo">ID del Sorteo</label>
-        <input type="number" id="idSorteo" name="idSorteo" readonly>
+    <div class="form-container">
+        <form id="modificarSorteoForm">
+            <!-- Campos del formulario -->
+            <label for="idSorteo">ID del Sorteo</label>
+            <input type="number" id="idSorteo" name="idSorteo" readonly>
 
-        <label for="nombre">Nombre del Sorteo</label>
-        <input type="text" id="nombre" name="nombre">
+            <label for="nombre">Nombre del Sorteo</label>
+            <input type="text" id="nombre" name="nombre" maxlength="30" required>
 
-        <label for="cantNumeros">Cantidad de Números</label>
-        <input type="number" id="cantNumeros" name="cantNumeros">
+            <label for="cantNumeros">Cantidad de Números</label>
+            <input type="number" id="cantNumeros" name="cantNumeros" required>
 
-        <label for="precio">Precio por Número</label>
-        <input type="number" step="0.01" id="precio" name="precio">
+            <label for="precio">Precio por Número</label>
+            <input type="number" step="0.01" id="precio" name="precio" required>
 
-        <label for="fechaInicio">Fecha de Inicio</label>
-        <input type="date" id="fechaInicio" name="fechaInicio" required>
+            <label for="fechaInicio">Fecha de Inicio</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" required>
 
-        <label for="fechaFin">Fecha de Fin</label>
-        <input type="date" id="fechaFin" name="fechaFin" required>
+            <label for="fechaFin">Fecha de Fin</label>
+            <input type="date" id="fechaFin" name="fechaFin" required>
 
-        <label for="fechaFinApartado">Fecha Límite de Apartado</label>
-        <input type="date" id="fechaFinApartado" name="fechaFinApartado" required>
+            <label for="fechaFinApartado">Fecha Límite de Apartado</label>
+            <input type="date" id="fechaFinApartado" name="duracionApartado" required>
 
-        <label for="imagen">Imagen (URL)</label>
-        <input type="text" id="imagen" name="imagen">
+            <label for="imagen">Imagen (URL)</label>
+            <input type="text" id="imagen" name="imagen">
 
-        <button type="submit" id="submitButton">Modificar Sorteo</button>
-        <a href="tableroControl.html" class="menu-button">Volver al Tablero</a>
-    </form>
-
+            <button type="submit" id="submitButton">Modificar Sorteo</button>
+            <a href="tableroControl.html" class="menu-button">Volver al Tablero</a>
+        </form>
+    </div>
     <div id="messageContainer"></div>
 
     <script>
         function cerrarSesion() {
-    Swal.fire({
-        title: "¿Estás seguro?",
-        text: "Se cerrará la sesión.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, cerrar sesión",
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem('idOrganizador');
-            localStorage.removeItem('tipoUsuario');
-            window.location.href = '/index.html';
-        }
-    });
- 
-}
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Se cerrará la sesión.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, cerrar sesión",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('idOrganizador');
+                    localStorage.removeItem('tipoUsuario');
+                    window.location.href = '/index.html';
+                }
+            });
+      }
 
         document.addEventListener('DOMContentLoaded', () => {
             const idOrganizador = localStorage.getItem('idOrganizador');
@@ -102,6 +102,45 @@
                 alert('Error: No se pudo obtener el ID del organizador. Inicia sesión nuevamente.');
                 window.location.href = '/iniciarSesion.html';
             }
+
+            const nombreInput = document.getElementById('nombre');
+            nombreInput.addEventListener('input', () => {
+                nombreInput.value = nombreInput.value
+                    .replace(/[^a-zA-Z0-9\s]/g, '') // Permite letras, números y espacios
+                    .slice(0, 30); // Limita a 30 caracteres
+            });
+
+            const cantNumerosInput = document.getElementById('cantNumeros');
+            cantNumerosInput.addEventListener('input', () => {
+                cantNumerosInput.value = cantNumerosInput.value
+                    .replace(/[^0-9]/g, ''); // Solo permite números positivos
+                if (parseInt(cantNumerosInput.value) > 1000) {
+                    cantNumerosInput.value = 1000; // Límite máximo
+                }
+            });
+
+            const precioInput = document.getElementById('precio');
+            precioInput.addEventListener('input', () => {
+                precioInput.value = precioInput.value
+                    .replace(/[^0-9.]/g, '') // Permite solo números y un punto
+                    .replace(/(\..*?)\..*/g, '$1'); // Evita más de un punto decimal
+                if (parseFloat(precioInput.value) > 3000) {
+                    precioInput.value = 3000; // Límite máximo
+                }
+            });
+
+            const fechaInputs = ['fechaInicio', 'fechaFin', 'fechaFinApartado'].map(id => document.getElementById(id));
+
+            fechaInputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    const fechaIngresada = new Date(input.value);
+                    if (!input.value || isNaN(fechaIngresada.getTime()) || fechaIngresada.getFullYear() > 2100) {
+                        input.value = formatDateToInput(new Date()); // Corrige con la fecha actual
+                    } else {
+
+                    }
+                });
+            });
 
             const form = document.getElementById('modificarSorteoForm');
             form.addEventListener('submit', handleSubmit);
@@ -166,9 +205,9 @@
                             errorMessages.push(error.message || error.error || 'Error desconocido');
                         }
 
-                        displayMessage(['Error al registrar el usuario:', ...errorMessages], 'error');
+                        displayMessage(['Error al modificar el sorteo:', ...errorMessages], 'error');
                     } catch (jsonError) {
-                        displayMessage(['Error al registrar el usuario:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
+                        displayMessage(['Error al modificar el sorteo:', 'Error desconocido (fallo al analizar la respuesta)'], 'error');
                     }
                 }
             } catch (error) {
