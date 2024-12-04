@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tablero de Control de Sorteo</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="css/styles.css">
   <script>
     // Verificar si el usuario ha iniciado sesión
@@ -54,6 +55,7 @@
     <!-- Información del sorteo -->
     <div class="sorteo-info">
       <h2 id="titulo-sorteo">Nombre del Sorteo</h2>
+      <p><strong>ID del Sorteo:</strong> <span id="id-sorteo"></span></p>
       <p><strong>Fecha de Fin:</strong> <span id="fecha-fin"></span></p>
       <p><strong>Días Restantes:</strong> <span id="dias-restantes"></span></p>
     </div>
@@ -90,10 +92,24 @@
   <script src="app.js"></script>
   <script>
     function cerrarSesion() {
-      localStorage.removeItem('idOrganizador');
-      localStorage.removeItem('tipoUsuario');
-      window.location.href = '/index.html';
-    }
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Se cerrará la sesión.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, cerrar sesión",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('idOrganizador');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = '/index.html';
+        }
+    });
+ 
+}
 
     const API_URL = 'http://localhost:3001/api/v1/sorteos/listar/';
     let selectedSorteoId;
@@ -107,7 +123,7 @@
         const sorteos = await response.json();
 
         if (!idSorteo) {
-          sorteoSelect.innerHTML = sorteos.map(s => `<option value="${s.id}">${s.id}</option>`).join('');
+          sorteoSelect.innerHTML = sorteos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
           sorteoSelect.value = sorteos[0]?.id || ''; // Selecciona el primer sorteo si existe
           selectedSorteoId = sorteos[0]?.id || null;
           if (sorteos.length > 0) cargarDatosSorteo(); // Llama otra vez para llenar datos
@@ -124,6 +140,7 @@
 
         // Actualiza los datos en el tablero
         document.getElementById('titulo-sorteo').innerText = sorteoSeleccionado.nombre;
+        document.getElementById('id-sorteo').innerText = sorteoSeleccionado.id;
         document.getElementById('fecha-fin').innerText = formatDateToInput(sorteoSeleccionado.fechaFin)
         document.getElementById('dias-restantes').innerText = calcularDiasRestantes(sorteoSeleccionado.fechaFin);
         document.getElementById('recaudado').innerText = ((sorteoSeleccionado.precio ?? 0) * (sorteoSeleccionado.boletosVendidos ?? 0)).toFixed(2);
