@@ -141,8 +141,8 @@
                 precioInput.value = precioInput.value
                     .replace(/[^0-9.]/g, '') // Permite solo números y un punto
                     .replace(/(\..*?)\..*/g, '$1'); // Evita más de un punto decimal
-                if (parseFloat(precioInput.value) > 3000) {
-                    precioInput.value = 3000; // Límite máximo
+                if (parseFloat(precioInput.value) > 2999) {
+                    precioInput.value = 2999; // Límite máximo
                 }
             });
 
